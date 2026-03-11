@@ -1,22 +1,31 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: AI Classroom Assistant API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: users
+    description: User management
+  - name: lectures
+    description: Lecture management
+  - name: transcripts
+    description: Transcript management
+  - name: tasks
+    description: Task management
+  - name: chat
+    description: AI Chatbot
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +33,271 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /users/sync:
+    post:
+      operationId: syncUser
+      tags: [users]
+      summary: Sync Firebase user to database
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SyncUserBody"
+      responses:
+        "200":
+          description: User synced
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /users/me:
+    get:
+      operationId: getMe
+      tags: [users]
+      summary: Get current user profile
+      parameters:
+        - in: query
+          name: firebaseUid
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: Not found
+
+  /lectures:
+    get:
+      operationId: getLectures
+      tags: [lectures]
+      summary: List lectures
+      parameters:
+        - in: query
+          name: firebaseUid
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of lectures
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Lecture"
+    post:
+      operationId: createLecture
+      tags: [lectures]
+      summary: Create a lecture
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateLectureBody"
+      responses:
+        "201":
+          description: Lecture created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Lecture"
+
+  /lectures/{id}:
+    get:
+      operationId: getLecture
+      tags: [lectures]
+      summary: Get a lecture
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Lecture detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LectureDetail"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteLecture
+      tags: [lectures]
+      summary: Delete a lecture
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /lectures/{id}/process:
+    post:
+      operationId: processLecture
+      tags: [lectures]
+      summary: Process audio - transcribe, summarize and extract tasks
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProcessLectureBody"
+      responses:
+        "200":
+          description: Processing started
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProcessLectureResponse"
+
+  /lectures/{id}/upload-url:
+    post:
+      operationId: getUploadUrl
+      tags: [lectures]
+      summary: Get a signed upload URL for Supabase Storage
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GetUploadUrlBody"
+      responses:
+        "200":
+          description: Upload URL
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UploadUrlResponse"
+
+  /tasks:
+    get:
+      operationId: getTasks
+      tags: [tasks]
+      summary: List tasks (optionally filter by lecture)
+      parameters:
+        - in: query
+          name: lectureId
+          required: false
+          schema:
+            type: ["integer", "null"]
+        - in: query
+          name: firebaseUid
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of tasks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Task"
+
+  /tasks/{id}/approve:
+    patch:
+      operationId: approveTask
+      tags: [tasks]
+      summary: Teacher approves a task
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Task approved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+
+  /tasks/{id}/reject:
+    patch:
+      operationId: rejectTask
+      tags: [tasks]
+      summary: Teacher rejects a task
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Task rejected
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+
+  /tasks/{id}/complete:
+    patch:
+      operationId: completeTask
+      tags: [tasks]
+      summary: Student marks a task as complete
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Task completed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+
+  /chat:
+    post:
+      operationId: chat
+      tags: [chat]
+      summary: Chat with AI about a lecture
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatBody"
+      responses:
+        "200":
+          description: Chat response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatResponse"
+
 components:
   schemas:
     HealthStatus:
@@ -31,6 +305,183 @@ components:
       properties:
         status:
           type: string
-      required:
-        - status
+      required: [status]
 
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        firebaseUid:
+          type: string
+        email:
+          type: string
+        displayName:
+          type: ["string", "null"]
+        role:
+          type: string
+          enum: [teacher, student]
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, firebaseUid, email, role, createdAt]
+
+    SyncUserBody:
+      type: object
+      properties:
+        firebaseUid:
+          type: string
+        email:
+          type: string
+        displayName:
+          type: ["string", "null"]
+        role:
+          type: string
+          enum: [teacher, student]
+      required: [firebaseUid, email, role]
+
+    Lecture:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: ["string", "null"]
+        audioUrl:
+          type: ["string", "null"]
+        status:
+          type: string
+          enum: [pending, processing, done, error]
+        teacherUid:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required: [id, title, status, teacherUid, createdAt, updatedAt]
+
+    LectureDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: ["string", "null"]
+        audioUrl:
+          type: ["string", "null"]
+        status:
+          type: string
+          enum: [pending, processing, done, error]
+        teacherUid:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        transcript:
+          type: ["string", "null"]
+        summary:
+          type: ["string", "null"]
+        tasks:
+          type: array
+          items:
+            $ref: "#/components/schemas/Task"
+      required: [id, title, status, teacherUid, createdAt, updatedAt]
+
+    CreateLectureBody:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: ["string", "null"]
+        teacherUid:
+          type: string
+      required: [title, teacherUid]
+
+    ProcessLectureBody:
+      type: object
+      properties:
+        audioUrl:
+          type: string
+      required: [audioUrl]
+
+    ProcessLectureResponse:
+      type: object
+      properties:
+        lectureId:
+          type: integer
+        status:
+          type: string
+        transcript:
+          type: ["string", "null"]
+        summary:
+          type: ["string", "null"]
+        tasksExtracted:
+          type: integer
+      required: [lectureId, status, tasksExtracted]
+
+    GetUploadUrlBody:
+      type: object
+      properties:
+        fileName:
+          type: string
+        contentType:
+          type: string
+      required: [fileName, contentType]
+
+    UploadUrlResponse:
+      type: object
+      properties:
+        uploadUrl:
+          type: string
+        publicUrl:
+          type: string
+      required: [uploadUrl, publicUrl]
+
+    Task:
+      type: object
+      properties:
+        id:
+          type: integer
+        lectureId:
+          type: integer
+        title:
+          type: string
+        description:
+          type: ["string", "null"]
+        deadline:
+          type: ["string", "null"]
+        status:
+          type: string
+          enum: [pending, approved, rejected, completed]
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, lectureId, title, status, createdAt]
+
+    ChatBody:
+      type: object
+      properties:
+        lectureId:
+          type: integer
+        message:
+          type: string
+        firebaseUid:
+          type: string
+      required: [lectureId, message, firebaseUid]
+
+    ChatResponse:
+      type: object
+      properties:
+        answer:
+          type: string
+      required: [answer]

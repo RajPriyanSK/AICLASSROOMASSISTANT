@@ -1,0 +1,15 @@
+packages:
+  "firebase": "Authentication for users"
+  "framer-motion": "Animations and page transitions"
+  "date-fns": "Formatting dates for lectures and tasks"
+  "clsx": "Utility for constructing className strings conditionally"
+  "tailwind-merge": "Utility for merging tailwind classes without conflicts"
+
+images:
+  - path: "artifacts/classroom/public/images/hero-bg.png"
+    description: "Abstract soft gradient background in calm professional academic blue and white tones"
+    aspect_ratio: "16:9"
+
+notes:
+  - Firebase environment variables must be prefixed with VITE_ to be accessible in the Vite frontend.
+  - Relying on generated @workspace/api-client-react hooks for API communication.
