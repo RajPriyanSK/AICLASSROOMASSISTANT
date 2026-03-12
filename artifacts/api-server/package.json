@@ -11,6 +11,7 @@
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
     "@supabase/supabase-js": "^2.99.1",
+    "@types/multer": "^2.1.0",
     "@workspace/api-zod": "workspace:*",
     "@workspace/db": "workspace:*",
     "axios": "^1.13.6",
@@ -19,7 +20,8 @@
     "drizzle-orm": "catalog:",
     "express": "^5",
     "form-data": "^4.0.5",
-    "groq-sdk": "^1.1.1"
+    "groq-sdk": "^1.1.1",
+    "multer": "^2.1.1"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.10",

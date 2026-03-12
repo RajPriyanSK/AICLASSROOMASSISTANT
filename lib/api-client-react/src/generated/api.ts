@@ -18,6 +18,7 @@ import type {
 
 import type {
   AnswerQuestionBody,
+  AudioUploadResponse,
   ChatBody,
   ChatResponse,
   CreateLectureBody,
@@ -35,6 +36,7 @@ import type {
   Question,
   SyncUserBody,
   Task,
+  UploadLectureAudioBody,
   UploadUrlResponse,
   User,
 } from "./api.schemas";
@@ -1162,6 +1164,97 @@ export const useCompleteTask = <
   TContext
 > => {
   return useMutation(getCompleteTaskMutationOptions(options));
+};
+
+/**
+ * @summary Upload audio file directly to Supabase Storage
+ */
+export const getUploadLectureAudioUrl = () => {
+  return `/api/upload-lecture-audio`;
+};
+
+export const uploadLectureAudio = async (
+  uploadLectureAudioBody: UploadLectureAudioBody,
+  options?: RequestInit,
+): Promise<AudioUploadResponse> => {
+  const formData = new FormData();
+  formData.append(`audio`, uploadLectureAudioBody.audio);
+  if (uploadLectureAudioBody.lectureId !== undefined) {
+    formData.append(`lectureId`, uploadLectureAudioBody.lectureId);
+  }
+
+  return customFetch<AudioUploadResponse>(getUploadLectureAudioUrl(), {
+    ...options,
+    method: "POST",
+    body: formData,
+  });
+};
+
+export const getUploadLectureAudioMutationOptions = <
+  TError = ErrorType<void>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof uploadLectureAudio>>,
+    TError,
+    { data: BodyType<UploadLectureAudioBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof uploadLectureAudio>>,
+  TError,
+  { data: BodyType<UploadLectureAudioBody> },
+  TContext
+> => {
+  const mutationKey = ["uploadLectureAudio"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof uploadLectureAudio>>,
+    { data: BodyType<UploadLectureAudioBody> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return uploadLectureAudio(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UploadLectureAudioMutationResult = NonNullable<
+  Awaited<ReturnType<typeof uploadLectureAudio>>
+>;
+export type UploadLectureAudioMutationBody = BodyType<UploadLectureAudioBody>;
+export type UploadLectureAudioMutationError = ErrorType<void>;
+
+/**
+ * @summary Upload audio file directly to Supabase Storage
+ */
+export const useUploadLectureAudio = <
+  TError = ErrorType<void>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof uploadLectureAudio>>,
+    TError,
+    { data: BodyType<UploadLectureAudioBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof uploadLectureAudio>>,
+  TError,
+  { data: BodyType<UploadLectureAudioBody> },
+  TContext
+> => {
+  return useMutation(getUploadLectureAudioMutationOptions(options));
 };
 
 /**

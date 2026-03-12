@@ -281,6 +281,38 @@ paths:
               schema:
                 $ref: "#/components/schemas/Task"
 
+  /upload-lecture-audio:
+    post:
+      operationId: uploadLectureAudio
+      tags: [lectures]
+      summary: Upload audio file directly to Supabase Storage
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                audio:
+                  type: string
+                  format: binary
+                  description: The audio file to upload
+                lectureId:
+                  type: string
+                  description: Optional lecture ID used for naming the file
+              required: [audio]
+      responses:
+        "201":
+          description: Audio uploaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AudioUploadResponse"
+        "400":
+          description: No audio file provided
+        "500":
+          description: Upload failed
+
   /questions:
     get:
       operationId: getQuestions
@@ -552,6 +584,23 @@ components:
           type: string
           format: date-time
       required: [id, lectureId, title, status, createdAt]
+
+    AudioUploadResponse:
+      type: object
+      properties:
+        publicUrl:
+          type: string
+          description: Public URL of the uploaded audio file
+        fileName:
+          type: string
+          description: Name of the file in Supabase Storage
+        size:
+          type: integer
+          description: File size in bytes
+        mimeType:
+          type: string
+          description: MIME type of the uploaded file
+      required: [publicUrl, fileName, size, mimeType]
 
     Question:
       type: object

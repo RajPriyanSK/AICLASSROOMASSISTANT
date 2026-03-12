@@ -7,6 +7,7 @@
  */
 
 export * from "./answerQuestionBody";
+export * from "./audioUploadResponse";
 export * from "./chatBody";
 export * from "./chatResponse";
 export * from "./createLectureBody";
@@ -28,6 +29,7 @@ export * from "./syncUserBody";
 export * from "./syncUserBodyRole";
 export * from "./task";
 export * from "./taskStatus";
+export * from "./uploadLectureAudioBody";
 export * from "./uploadUrlResponse";
 export * from "./user";
 export * from "./userRole";

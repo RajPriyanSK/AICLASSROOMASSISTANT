@@ -224,6 +224,17 @@ export const CompleteTaskResponse = zod.object({
 });
 
 /**
+ * @summary Upload audio file directly to Supabase Storage
+ */
+export const UploadLectureAudioBody = zod.object({
+  audio: zod.instanceof(File).describe("The audio file to upload"),
+  lectureId: zod
+    .string()
+    .optional()
+    .describe("Optional lecture ID used for naming the file"),
+});
+
+/**
  * @summary List questions (for a lecture or all)
  */
 export const GetQuestionsQueryParams = zod.object({

@@ -144,6 +144,17 @@ export interface UploadUrlResponse {
   publicUrl: string;
 }
 
+export interface AudioUploadResponse {
+  /** Public URL of the uploaded audio file */
+  publicUrl: string;
+  /** Name of the file in Supabase Storage */
+  fileName: string;
+  /** File size in bytes */
+  size: number;
+  /** MIME type of the uploaded file */
+  mimeType: string;
+}
+
 export interface Question {
   id: number;
   studentId: number;
@@ -188,6 +199,13 @@ export type GetTasksParams = {
    */
   lectureId?: number | null;
   firebaseUid: string;
+};
+
+export type UploadLectureAudioBody = {
+  /** The audio file to upload */
+  audio: Blob;
+  /** Optional lecture ID used for naming the file */
+  lectureId?: string;
 };
 
 export type GetQuestionsParams = {
