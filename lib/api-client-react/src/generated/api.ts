@@ -36,6 +36,8 @@ import type {
   Question,
   SyncUserBody,
   Task,
+  TranscribeBody,
+  TranscribeResponse,
   UploadLectureAudioBody,
   UploadUrlResponse,
   User,
@@ -1164,6 +1166,92 @@ export const useCompleteTask = <
   TContext
 > => {
   return useMutation(getCompleteTaskMutationOptions(options));
+};
+
+/**
+ * @summary Send audio URL to RapidAPI Speech-to-Text and store transcript in PostgreSQL
+ */
+export const getTranscribeLectureUrl = () => {
+  return `/api/transcribe`;
+};
+
+export const transcribeLecture = async (
+  transcribeBody: TranscribeBody,
+  options?: RequestInit,
+): Promise<TranscribeResponse> => {
+  return customFetch<TranscribeResponse>(getTranscribeLectureUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(transcribeBody),
+  });
+};
+
+export const getTranscribeLectureMutationOptions = <
+  TError = ErrorType<void>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof transcribeLecture>>,
+    TError,
+    { data: BodyType<TranscribeBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof transcribeLecture>>,
+  TError,
+  { data: BodyType<TranscribeBody> },
+  TContext
+> => {
+  const mutationKey = ["transcribeLecture"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof transcribeLecture>>,
+    { data: BodyType<TranscribeBody> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return transcribeLecture(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type TranscribeLectureMutationResult = NonNullable<
+  Awaited<ReturnType<typeof transcribeLecture>>
+>;
+export type TranscribeLectureMutationBody = BodyType<TranscribeBody>;
+export type TranscribeLectureMutationError = ErrorType<void>;
+
+/**
+ * @summary Send audio URL to RapidAPI Speech-to-Text and store transcript in PostgreSQL
+ */
+export const useTranscribeLecture = <
+  TError = ErrorType<void>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof transcribeLecture>>,
+    TError,
+    { data: BodyType<TranscribeBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof transcribeLecture>>,
+  TError,
+  { data: BodyType<TranscribeBody> },
+  TContext
+> => {
+  return useMutation(getTranscribeLectureMutationOptions(options));
 };
 
 /**

@@ -224,6 +224,36 @@ export const CompleteTaskResponse = zod.object({
 });
 
 /**
+ * @summary Send audio URL to RapidAPI Speech-to-Text and store transcript in PostgreSQL
+ */
+export const transcribeLectureBodyLanguageDefault = `en`;
+
+export const TranscribeLectureBody = zod.object({
+  audioUrl: zod.string().describe("Publicly accessible URL of the audio file"),
+  lectureId: zod
+    .number()
+    .nullish()
+    .describe(
+      "Optional lecture ID — if provided, stores transcript in Neon PostgreSQL",
+    ),
+  language: zod
+    .string()
+    .default(transcribeLectureBodyLanguageDefault)
+    .describe('BCP-47 language code (e.g. \"en\", \"es\", \"fr\")'),
+});
+
+export const TranscribeLectureResponse = zod.object({
+  transcript: zod
+    .string()
+    .describe("Full transcript text returned by RapidAPI"),
+  lectureId: zod.number().nullish(),
+  audioUrl: zod.string(),
+  language: zod.string(),
+  charCount: zod.number().describe("Number of characters in the transcript"),
+  wordCount: zod.number().describe("Number of words in the transcript"),
+});
+
+/**
  * @summary Upload audio file directly to Supabase Storage
  */
 export const UploadLectureAudioBody = zod.object({

@@ -29,6 +29,8 @@ export * from "./syncUserBody";
 export * from "./syncUserBodyRole";
 export * from "./task";
 export * from "./taskStatus";
+export * from "./transcribeBody";
+export * from "./transcribeResponse";
 export * from "./uploadLectureAudioBody";
 export * from "./uploadUrlResponse";
 export * from "./user";

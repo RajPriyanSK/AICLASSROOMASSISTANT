@@ -144,6 +144,31 @@ export interface UploadUrlResponse {
   publicUrl: string;
 }
 
+export interface TranscribeBody {
+  /** Publicly accessible URL of the audio file */
+  audioUrl: string;
+  /**
+   * Optional lecture ID — if provided, stores transcript in Neon PostgreSQL
+   * @nullable
+   */
+  lectureId?: number | null;
+  /** BCP-47 language code (e.g. "en", "es", "fr") */
+  language?: string;
+}
+
+export interface TranscribeResponse {
+  /** Full transcript text returned by RapidAPI */
+  transcript: string;
+  /** @nullable */
+  lectureId?: number | null;
+  audioUrl: string;
+  language: string;
+  /** Number of characters in the transcript */
+  charCount: number;
+  /** Number of words in the transcript */
+  wordCount: number;
+}
+
 export interface AudioUploadResponse {
   /** Public URL of the uploaded audio file */
   publicUrl: string;
