@@ -17,11 +17,14 @@ import type {
 } from "@tanstack/react-query";
 
 import type {
+  AnswerQuestionBody,
   ChatBody,
   ChatResponse,
   CreateLectureBody,
+  CreateQuestionBody,
   GetLecturesParams,
   GetMeParams,
+  GetQuestionsParams,
   GetTasksParams,
   GetUploadUrlBody,
   HealthStatus,
@@ -29,6 +32,7 @@ import type {
   LectureDetail,
   ProcessLectureBody,
   ProcessLectureResponse,
+  Question,
   SyncUserBody,
   Task,
   UploadUrlResponse,
@@ -1158,6 +1162,357 @@ export const useCompleteTask = <
   TContext
 > => {
   return useMutation(getCompleteTaskMutationOptions(options));
+};
+
+/**
+ * @summary List questions (for a lecture or all)
+ */
+export const getGetQuestionsUrl = (params: GetQuestionsParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/questions?${stringifiedParams}`
+    : `/api/questions`;
+};
+
+export const getQuestions = async (
+  params: GetQuestionsParams,
+  options?: RequestInit,
+): Promise<Question[]> => {
+  return customFetch<Question[]>(getGetQuestionsUrl(params), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetQuestionsQueryKey = (params?: GetQuestionsParams) => {
+  return [`/api/questions`, ...(params ? [params] : [])] as const;
+};
+
+export const getGetQuestionsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getQuestions>>,
+  TError = ErrorType<unknown>,
+>(
+  params: GetQuestionsParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getQuestions>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetQuestionsQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getQuestions>>> = ({
+    signal,
+  }) => getQuestions(params, { signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getQuestions>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetQuestionsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getQuestions>>
+>;
+export type GetQuestionsQueryError = ErrorType<unknown>;
+
+/**
+ * @summary List questions (for a lecture or all)
+ */
+
+export function useGetQuestions<
+  TData = Awaited<ReturnType<typeof getQuestions>>,
+  TError = ErrorType<unknown>,
+>(
+  params: GetQuestionsParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getQuestions>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetQuestionsQueryOptions(params, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Student submits a question
+ */
+export const getCreateQuestionUrl = () => {
+  return `/api/questions`;
+};
+
+export const createQuestion = async (
+  createQuestionBody: CreateQuestionBody,
+  options?: RequestInit,
+): Promise<Question> => {
+  return customFetch<Question>(getCreateQuestionUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(createQuestionBody),
+  });
+};
+
+export const getCreateQuestionMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createQuestion>>,
+    TError,
+    { data: BodyType<CreateQuestionBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createQuestion>>,
+  TError,
+  { data: BodyType<CreateQuestionBody> },
+  TContext
+> => {
+  const mutationKey = ["createQuestion"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createQuestion>>,
+    { data: BodyType<CreateQuestionBody> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createQuestion(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateQuestionMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createQuestion>>
+>;
+export type CreateQuestionMutationBody = BodyType<CreateQuestionBody>;
+export type CreateQuestionMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Student submits a question
+ */
+export const useCreateQuestion = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createQuestion>>,
+    TError,
+    { data: BodyType<CreateQuestionBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof createQuestion>>,
+  TError,
+  { data: BodyType<CreateQuestionBody> },
+  TContext
+> => {
+  return useMutation(getCreateQuestionMutationOptions(options));
+};
+
+/**
+ * @summary Teacher answers a question
+ */
+export const getAnswerQuestionUrl = (id: number) => {
+  return `/api/questions/${id}/answer`;
+};
+
+export const answerQuestion = async (
+  id: number,
+  answerQuestionBody: AnswerQuestionBody,
+  options?: RequestInit,
+): Promise<Question> => {
+  return customFetch<Question>(getAnswerQuestionUrl(id), {
+    ...options,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(answerQuestionBody),
+  });
+};
+
+export const getAnswerQuestionMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof answerQuestion>>,
+    TError,
+    { id: number; data: BodyType<AnswerQuestionBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof answerQuestion>>,
+  TError,
+  { id: number; data: BodyType<AnswerQuestionBody> },
+  TContext
+> => {
+  const mutationKey = ["answerQuestion"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof answerQuestion>>,
+    { id: number; data: BodyType<AnswerQuestionBody> }
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return answerQuestion(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AnswerQuestionMutationResult = NonNullable<
+  Awaited<ReturnType<typeof answerQuestion>>
+>;
+export type AnswerQuestionMutationBody = BodyType<AnswerQuestionBody>;
+export type AnswerQuestionMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Teacher answers a question
+ */
+export const useAnswerQuestion = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof answerQuestion>>,
+    TError,
+    { id: number; data: BodyType<AnswerQuestionBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof answerQuestion>>,
+  TError,
+  { id: number; data: BodyType<AnswerQuestionBody> },
+  TContext
+> => {
+  return useMutation(getAnswerQuestionMutationOptions(options));
+};
+
+/**
+ * @summary Delete a question
+ */
+export const getDeleteQuestionUrl = (id: number) => {
+  return `/api/questions/${id}`;
+};
+
+export const deleteQuestion = async (
+  id: number,
+  options?: RequestInit,
+): Promise<void> => {
+  return customFetch<void>(getDeleteQuestionUrl(id), {
+    ...options,
+    method: "DELETE",
+  });
+};
+
+export const getDeleteQuestionMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteQuestion>>,
+    TError,
+    { id: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteQuestion>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  const mutationKey = ["deleteQuestion"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteQuestion>>,
+    { id: number }
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return deleteQuestion(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteQuestionMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteQuestion>>
+>;
+
+export type DeleteQuestionMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Delete a question
+ */
+export const useDeleteQuestion = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteQuestion>>,
+    TError,
+    { id: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof deleteQuestion>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  return useMutation(getDeleteQuestionMutationOptions(options));
 };
 
 /**

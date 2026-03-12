@@ -6,11 +6,14 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from "./answerQuestionBody";
 export * from "./chatBody";
 export * from "./chatResponse";
 export * from "./createLectureBody";
+export * from "./createQuestionBody";
 export * from "./getLecturesParams";
 export * from "./getMeParams";
+export * from "./getQuestionsParams";
 export * from "./getTasksParams";
 export * from "./getUploadUrlBody";
 export * from "./healthStatus";
@@ -20,6 +23,7 @@ export * from "./lectureDetailStatus";
 export * from "./lectureStatus";
 export * from "./processLectureBody";
 export * from "./processLectureResponse";
+export * from "./question";
 export * from "./syncUserBody";
 export * from "./syncUserBodyRole";
 export * from "./task";

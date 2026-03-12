@@ -224,6 +224,60 @@ export const CompleteTaskResponse = zod.object({
 });
 
 /**
+ * @summary List questions (for a lecture or all)
+ */
+export const GetQuestionsQueryParams = zod.object({
+  firebaseUid: zod.coerce.string(),
+  lectureId: zod.coerce.number().nullish(),
+});
+
+export const GetQuestionsResponseItem = zod.object({
+  id: zod.number(),
+  studentId: zod.number(),
+  lectureId: zod.number(),
+  question: zod.string(),
+  answer: zod.string().nullish(),
+  createdAt: zod.date(),
+});
+export const GetQuestionsResponse = zod.array(GetQuestionsResponseItem);
+
+/**
+ * @summary Student submits a question
+ */
+export const CreateQuestionBody = zod.object({
+  firebaseUid: zod.string(),
+  lectureId: zod.number(),
+  question: zod.string(),
+});
+
+/**
+ * @summary Teacher answers a question
+ */
+export const AnswerQuestionParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const AnswerQuestionBody = zod.object({
+  answer: zod.string(),
+});
+
+export const AnswerQuestionResponse = zod.object({
+  id: zod.number(),
+  studentId: zod.number(),
+  lectureId: zod.number(),
+  question: zod.string(),
+  answer: zod.string().nullish(),
+  createdAt: zod.date(),
+});
+
+/**
+ * @summary Delete a question
+ */
+export const DeleteQuestionParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+/**
  * @summary Chat with AI about a lecture
  */
 export const ChatBody = zod.object({

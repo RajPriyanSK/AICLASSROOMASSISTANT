@@ -144,6 +144,26 @@ export interface UploadUrlResponse {
   publicUrl: string;
 }
 
+export interface Question {
+  id: number;
+  studentId: number;
+  lectureId: number;
+  question: string;
+  /** @nullable */
+  answer?: string | null;
+  createdAt: string;
+}
+
+export interface CreateQuestionBody {
+  firebaseUid: string;
+  lectureId: number;
+  question: string;
+}
+
+export interface AnswerQuestionBody {
+  answer: string;
+}
+
 export interface ChatBody {
   lectureId: number;
   message: string;
@@ -168,4 +188,12 @@ export type GetTasksParams = {
    */
   lectureId?: number | null;
   firebaseUid: string;
+};
+
+export type GetQuestionsParams = {
+  firebaseUid: string;
+  /**
+   * @nullable
+   */
+  lectureId?: number | null;
 };

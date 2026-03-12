@@ -17,6 +17,8 @@ tags:
     description: Transcript management
   - name: tasks
     description: Task management
+  - name: questions
+    description: Student Q&A
   - name: chat
     description: AI Chatbot
 
@@ -279,6 +281,89 @@ paths:
               schema:
                 $ref: "#/components/schemas/Task"
 
+  /questions:
+    get:
+      operationId: getQuestions
+      tags: [questions]
+      summary: List questions (for a lecture or all)
+      parameters:
+        - in: query
+          name: firebaseUid
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: lectureId
+          required: false
+          schema:
+            type: ["integer", "null"]
+      responses:
+        "200":
+          description: List of questions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Question"
+    post:
+      operationId: createQuestion
+      tags: [questions]
+      summary: Student submits a question
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateQuestionBody"
+      responses:
+        "201":
+          description: Question created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Question"
+
+  /questions/{id}/answer:
+    patch:
+      operationId: answerQuestion
+      tags: [questions]
+      summary: Teacher answers a question
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnswerQuestionBody"
+      responses:
+        "200":
+          description: Question answered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Question"
+
+  /questions/{id}:
+    delete:
+      operationId: deleteQuestion
+      tags: [questions]
+      summary: Delete a question
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
   /chat:
     post:
       operationId: chat
@@ -467,6 +552,42 @@ components:
           type: string
           format: date-time
       required: [id, lectureId, title, status, createdAt]
+
+    Question:
+      type: object
+      properties:
+        id:
+          type: integer
+        studentId:
+          type: integer
+        lectureId:
+          type: integer
+        question:
+          type: string
+        answer:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, studentId, lectureId, question, createdAt]
+
+    CreateQuestionBody:
+      type: object
+      properties:
+        firebaseUid:
+          type: string
+        lectureId:
+          type: integer
+        question:
+          type: string
+      required: [firebaseUid, lectureId, question]
+
+    AnswerQuestionBody:
+      type: object
+      properties:
+        answer:
+          type: string
+      required: [answer]
 
     ChatBody:
       type: object
