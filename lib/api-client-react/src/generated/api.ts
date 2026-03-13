@@ -34,6 +34,8 @@ import type {
   ProcessLectureBody,
   ProcessLectureResponse,
   Question,
+  SummarizeBody,
+  SummarizeResponse,
   SyncUserBody,
   Task,
   TranscribeBody,
@@ -1166,6 +1168,92 @@ export const useCompleteTask = <
   TContext
 > => {
   return useMutation(getCompleteTaskMutationOptions(options));
+};
+
+/**
+ * @summary Send transcript to Gemini — extract summary, assignments, homework and deadlines
+ */
+export const getSummarizeLectureUrl = () => {
+  return `/api/summarize`;
+};
+
+export const summarizeLecture = async (
+  summarizeBody: SummarizeBody,
+  options?: RequestInit,
+): Promise<SummarizeResponse> => {
+  return customFetch<SummarizeResponse>(getSummarizeLectureUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(summarizeBody),
+  });
+};
+
+export const getSummarizeLectureMutationOptions = <
+  TError = ErrorType<void>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof summarizeLecture>>,
+    TError,
+    { data: BodyType<SummarizeBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof summarizeLecture>>,
+  TError,
+  { data: BodyType<SummarizeBody> },
+  TContext
+> => {
+  const mutationKey = ["summarizeLecture"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof summarizeLecture>>,
+    { data: BodyType<SummarizeBody> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return summarizeLecture(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SummarizeLectureMutationResult = NonNullable<
+  Awaited<ReturnType<typeof summarizeLecture>>
+>;
+export type SummarizeLectureMutationBody = BodyType<SummarizeBody>;
+export type SummarizeLectureMutationError = ErrorType<void>;
+
+/**
+ * @summary Send transcript to Gemini — extract summary, assignments, homework and deadlines
+ */
+export const useSummarizeLecture = <
+  TError = ErrorType<void>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof summarizeLecture>>,
+    TError,
+    { data: BodyType<SummarizeBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof summarizeLecture>>,
+  TError,
+  { data: BodyType<SummarizeBody> },
+  TContext
+> => {
+  return useMutation(getSummarizeLectureMutationOptions(options));
 };
 
 /**

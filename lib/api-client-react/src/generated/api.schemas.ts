@@ -144,6 +144,34 @@ export interface UploadUrlResponse {
   publicUrl: string;
 }
 
+export interface ExtractedTask {
+  title: string;
+  description: string;
+  /** @nullable */
+  due_date?: string | null;
+}
+
+export interface SummarizeBody {
+  /** Full lecture transcript text to analyze */
+  transcript: string;
+  /**
+   * If provided, persists summary and tasks to Neon PostgreSQL
+   * @nullable
+   */
+  lectureId?: number | null;
+}
+
+export interface SummarizeResponse {
+  /** Structured lecture summary from Gemini */
+  summary: string;
+  /** All assignments, homework, and deadlines extracted from the transcript */
+  tasks: ExtractedTask[];
+  /** @nullable */
+  lectureId?: number | null;
+  /** Number of task rows inserted into the database */
+  tasksCreated: number;
+}
+
 export interface TranscribeBody {
   /** Publicly accessible URL of the audio file */
   audioUrl: string;

@@ -224,6 +224,36 @@ export const CompleteTaskResponse = zod.object({
 });
 
 /**
+ * @summary Send transcript to Gemini — extract summary, assignments, homework and deadlines
+ */
+export const SummarizeLectureBody = zod.object({
+  transcript: zod.string().describe("Full lecture transcript text to analyze"),
+  lectureId: zod
+    .number()
+    .nullish()
+    .describe("If provided, persists summary and tasks to Neon PostgreSQL"),
+});
+
+export const SummarizeLectureResponse = zod.object({
+  summary: zod.string().describe("Structured lecture summary from Gemini"),
+  tasks: zod
+    .array(
+      zod.object({
+        title: zod.string(),
+        description: zod.string(),
+        due_date: zod.string().nullish(),
+      }),
+    )
+    .describe(
+      "All assignments, homework, and deadlines extracted from the transcript",
+    ),
+  lectureId: zod.number().nullish(),
+  tasksCreated: zod
+    .number()
+    .describe("Number of task rows inserted into the database"),
+});
+
+/**
  * @summary Send audio URL to RapidAPI Speech-to-Text and store transcript in PostgreSQL
  */
 export const transcribeLectureBodyLanguageDefault = `en`;
