@@ -14,24 +14,29 @@ router.post("/users/sync", async (req, res): Promise<void> => {
 
   const { firebaseUid, email, displayName, role } = parsed.data;
 
-  const existing = await db.select().from(usersTable).where(eq(usersTable.firebaseUid, firebaseUid));
+  try {
+    const existing = await db.select().from(usersTable).where(eq(usersTable.firebaseUid, firebaseUid));
 
-  if (existing.length > 0) {
-    const [updated] = await db
-      .update(usersTable)
-      .set({ email, displayName: displayName ?? null })
-      .where(eq(usersTable.firebaseUid, firebaseUid))
+    if (existing.length > 0) {
+      const [updated] = await db
+        .update(usersTable)
+        .set({ email, displayName: displayName ?? null })
+        .where(eq(usersTable.firebaseUid, firebaseUid))
+        .returning();
+      res.json(SyncUserResponse.parse(updated));
+      return;
+    }
+
+    const [user] = await db
+      .insert(usersTable)
+      .values({ firebaseUid, email, displayName: displayName ?? null, role })
       .returning();
-    res.json(SyncUserResponse.parse(updated));
-    return;
+
+    res.json(SyncUserResponse.parse(user));
+  } catch (err) {
+    console.error("DATABASE_ERROR in /api/users/sync:", err);
+    res.status(500).json({ error: "Internal database error during sync" });
   }
-
-  const [user] = await db
-    .insert(usersTable)
-    .values({ firebaseUid, email, displayName: displayName ?? null, role })
-    .returning();
-
-  res.json(SyncUserResponse.parse(user));
 });
 
 router.get("/users/me", async (req, res): Promise<void> => {
@@ -41,17 +46,22 @@ router.get("/users/me", async (req, res): Promise<void> => {
     return;
   }
 
-  const [user] = await db
-    .select()
-    .from(usersTable)
-    .where(eq(usersTable.firebaseUid, params.data.firebaseUid));
+  try {
+    const [user] = await db
+      .select()
+      .from(usersTable)
+      .where(eq(usersTable.firebaseUid, params.data.firebaseUid));
 
-  if (!user) {
-    res.status(404).json({ error: "User not found" });
-    return;
+    if (!user) {
+      res.status(404).json({ error: "User not found" });
+      return;
+    }
+
+    res.json(GetMeResponse.parse(user));
+  } catch (err) {
+    console.error("DATABASE_ERROR in /api/users/me:", err);
+    res.status(500).json({ error: "Internal database error" });
   }
-
-  res.json(GetMeResponse.parse(user));
 });
 
 export default router;
