@@ -42,18 +42,24 @@ export async function transcribeAudio(
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       // The API expects url, lang, and task as query parameters per the snippet provided
-      const fullUrl = `${TRANSCRIBE_URL}?url=${encodeURIComponent(audioUrl)}&lang=${language}&task=transcribe`;
-      
+      const encodedParams = new URLSearchParams();
+      encodedParams.set('file', 'undefined');
+
       const { data } = await axios.post<RapidApiResponse>(
-        fullUrl,
-        "file=", // Body as requested in snippet
+        TRANSCRIBE_URL,
+        encodedParams,
         {
+          params: {
+            url: audioUrl,
+            lang: language,
+            task: "transcribe",
+          },
           headers: {
             "x-rapidapi-key": apiKey,
             "x-rapidapi-host": RAPIDAPI_HOST,
             "Content-Type": "application/x-www-form-urlencoded",
           },
-          timeout: 480_000, // Increased to 8 minutes for safety
+          timeout: 480_000, // 8 minutes
         }
       );
 
