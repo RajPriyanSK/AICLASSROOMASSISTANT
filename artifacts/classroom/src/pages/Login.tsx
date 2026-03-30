@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import {
   signInWithEmailAndPassword,
@@ -22,8 +22,14 @@ export default function Login() {
   const [resetSent, setResetSent] = useState(false);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const { resetPassword } = useAuth();
+  const { resetPassword, firebaseUser, isLoading } = useAuth();
   const syncMutation = useSyncUser();
+
+  useEffect(() => {
+    if (!isLoading && firebaseUser) {
+      setLocation("/");
+    }
+  }, [isLoading, firebaseUser, setLocation]);
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();

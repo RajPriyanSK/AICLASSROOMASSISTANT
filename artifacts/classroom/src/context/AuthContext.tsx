@@ -4,6 +4,8 @@ import {
   signOut,
   User as FirebaseUser,
   sendPasswordResetEmail,
+  setPersistence,
+  browserLocalPersistence,
 } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { useGetMe, useSyncUser, getGetMeQueryKey } from "@workspace/api-client-react";
@@ -35,6 +37,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const syncMutation = useSyncUser();
 
   useEffect(() => {
+    // Explicitly set persistence to ensure users stay logged in
+    setPersistence(auth, browserLocalPersistence).catch(console.error);
+
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setFirebaseUser(user);
       setAuthLoading(false);

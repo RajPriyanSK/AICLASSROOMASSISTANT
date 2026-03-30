@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "@/lib/firebase";
@@ -7,9 +7,12 @@ import { BookOpen, UserPlus, Eye, EyeOff, GraduationCap, School } from "lucide-r
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 
+import { useAuth } from "@/context/AuthContext";
+
 type Role = "teacher" | "student";
 
 export default function Signup() {
+  const { firebaseUser, isLoading } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -20,6 +23,12 @@ export default function Signup() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const syncMutation = useSyncUser();
+
+  useEffect(() => {
+    if (!isLoading && firebaseUser) {
+      setLocation("/");
+    }
+  }, [isLoading, firebaseUser, setLocation]);
 
   const passwordStrength = () => {
     if (password.length === 0) return null;

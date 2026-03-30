@@ -38,7 +38,7 @@ console.log('--- Starting API Server and Classroom Frontend ---');
 
 // Backend needs PORT=5000 and NODE_ENV=development
 // Frontend will use default port (5173 or similar) and proxy /api to 5000
-const apiProcess = spawn('npx', ['tsx', './src/index.ts'], {
+const apiProcess = spawn('npx', ['tsx', '--watch', './src/index.ts'], {
   cwd: path.resolve(process.cwd(), 'artifacts/api-server'),
   stdio: 'inherit',
   shell: true,

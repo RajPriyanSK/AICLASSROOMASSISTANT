@@ -100,6 +100,7 @@ export async function analyzeLecture(transcript: string): Promise<LectureAnalysi
       }
     }
     console.warn("[gemini] Failed to parse JSON response. Raw:", raw.slice(0, 300));
+    console.error("[gemini] Error details:", raw);
     return { summary: raw, tasks: [] };
   }
 }

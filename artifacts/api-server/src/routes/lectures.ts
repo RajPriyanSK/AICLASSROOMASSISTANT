@@ -209,6 +209,7 @@ router.post("/lectures/:id/process", async (req, res): Promise<void> => {
       .where(eq(lecturesTable.id, params.data.id));
 
     const message = err instanceof Error ? err.message : "Processing failed";
+    console.error("[lectures] Processing error:", err);
     res.status(500).json({ error: message });
   }
 });

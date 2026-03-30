@@ -42,21 +42,18 @@ export async function transcribeAudio(
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       // The API expects url, lang, and task as query parameters per the snippet provided
+      const fullUrl = `${TRANSCRIBE_URL}?url=${encodeURIComponent(audioUrl)}&lang=${language}&task=transcribe`;
+      
       const { data } = await axios.post<RapidApiResponse>(
-        TRANSCRIBE_URL,
+        fullUrl,
         "file=", // Body as requested in snippet
         {
-          params: {
-            url: audioUrl,
-            lang: language,
-            task: "transcribe",
-          },
           headers: {
             "x-rapidapi-key": apiKey,
             "x-rapidapi-host": RAPIDAPI_HOST,
             "Content-Type": "application/x-www-form-urlencoded",
           },
-          timeout: 180_000, // 3 minutes
+          timeout: 480_000, // Increased to 8 minutes for safety
         }
       );
 
@@ -74,6 +71,7 @@ export async function transcribeAudio(
           ? `RapidAPI error ${status}: ${JSON.stringify(axiosErr.response.data)}`
           : axiosErr.message
       );
+      console.error("[speechToText] Attempt", attempt, "failed:", lastError.message);
 
       if (status >= 400 && status < 500) break;
 
