@@ -17,7 +17,8 @@ import {
 } from "@workspace/api-zod";
 import { getSupabase, BUCKET_NAME, ensureBucketExists } from "../lib/supabase.js";
 import { transcribeAudio } from "../lib/speechToText.js";
-import { summarizeLecture, extractTasks } from "../lib/gemini.js";
+import { summarizeLecture } from "../lib/gemini.js";
+import { extractTasksFromTranscript as extractTasks } from "../lib/groq.js";
 
 const router: IRouter = Router();
 

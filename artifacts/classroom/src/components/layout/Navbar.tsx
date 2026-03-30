@@ -47,6 +47,26 @@ export function Navbar() {
             </div>
           )}
 
+          {dbUser?.role === "student" && (
+            <div className="hidden lg:flex items-center gap-1 bg-secondary/50 p-1 rounded-2xl border border-border/50">
+              <Link href="/dashboard/student" className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${useLocation()[0] === "/dashboard/student" ? "bg-background text-primary shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>
+                <LayoutDashboard className="w-4 h-4" /> Dashboard
+              </Link>
+              <Link href="/dashboard/student/lectures" className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${useLocation()[0] === "/dashboard/student/lectures" ? "bg-background text-primary shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>
+                <BookOpen className="w-4 h-4" /> Lectures
+              </Link>
+              <Link href="/dashboard/student/tasks" className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${useLocation()[0] === "/dashboard/student/tasks" ? "bg-background text-primary shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>
+                <ListTodo className="w-4 h-4" /> Assignments
+              </Link>
+              <Link href="/dashboard/student/calendar" className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${useLocation()[0] === "/dashboard/student/calendar" ? "bg-background text-primary shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>
+                <Calendar className="w-4 h-4" /> Calendar
+              </Link>
+              <Link href="/dashboard/student/settings" className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${useLocation()[0] === "/dashboard/student/settings" ? "bg-background text-primary shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>
+                <Settings className="w-4 h-4" /> Settings
+              </Link>
+            </div>
+          )}
+
           <div className="flex items-center gap-6">
             <div className="hidden md:flex flex-col items-end">
               <span className="text-sm font-medium text-foreground">

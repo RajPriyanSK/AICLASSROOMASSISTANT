@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { Navbar } from "@/components/layout/Navbar";
 import { AudioRecorder } from "@/components/AudioRecorder";
@@ -11,7 +11,7 @@ import {
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { Mic, Radio, Loader2, Plus, ChevronRight, History, Play } from "lucide-react";
+import { Mic, Radio, Loader2, Plus, ChevronRight, History, Play, Upload as UploadIcon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { format } from "date-fns";
 import { Link } from "wouter";
@@ -24,10 +24,38 @@ export default function Recording() {
   const [activeLectureId, setActiveLectureId] = useState<number | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [newTitle, setNewTitle] = useState("");
+  
+  // File upload state
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [isFileUploading, setIsFileUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const createMutation = useCreateLecture();
   const uploadUrlMutation = useGetUploadUrl();
   const processMutation = useProcessLecture();
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files?.[0]) setUploadFile(e.target.files[0]);
+  };
+
+  const handleFileUploadAndProcess = async () => {
+    if (!uploadFile || !firebaseUser || !activeLectureId) return;
+    setIsFileUploading(true);
+    try {
+      const ext = uploadFile.name.split(".").pop() ?? "mp3";
+      const fileName = `lecture-${activeLectureId}-${Date.now()}.${ext}`;
+      const publicUrl = await getUploadUrlAndProcess(uploadFile, fileName, uploadFile.type);
+      await processMutation.mutateAsync({ id: activeLectureId, data: { audioUrl: publicUrl } });
+      toast({ title: "Upload successful", description: "AI is now processing your lecture." });
+      setActiveLectureId(null);
+      setUploadFile(null);
+      queryClient.invalidateQueries({ queryKey: getGetLecturesQueryKey() });
+    } catch {
+      toast({ title: "Upload failed", variant: "destructive" });
+    } finally {
+      setIsFileUploading(false);
+    }
+  };
 
   const lecturesParams = { firebaseUid: firebaseUser?.uid || "" };
   const { data: lectures = [] } = useGetLectures(
@@ -173,6 +201,59 @@ export default function Recording() {
                 uploadFn={getUploadUrlAndProcess}
                 onUploadSuccess={handleUploadSuccess}
               />
+
+              {/* Divider */}
+              <div className="flex items-center gap-4 my-8">
+                <div className="flex-1 border-t border-border" />
+                <span className="text-sm text-muted-foreground font-medium uppercase tracking-wider">or upload a file</span>
+                <div className="flex-1 border-t border-border" />
+              </div>
+
+              {/* File Upload Section */}
+              <div className="bg-card border border-border rounded-3xl p-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="flex items-center gap-4">
+                  <div className="bg-secondary p-3 rounded-2xl">
+                    <UploadIcon className="w-6 h-6 text-muted-foreground" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-lg">Upload Audio File</h4>
+                    <p className="text-sm text-muted-foreground">MP3, WAV, or WEBM (Max 200MB)</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 w-full md:w-auto">
+                  <input
+                    type="file"
+                    accept="audio/*"
+                    className="hidden"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                  />
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-secondary border border-border hover:bg-secondary/80 text-foreground rounded-2xl font-bold transition-all"
+                  >
+                    {uploadFile ? "Change File" : "Select File"}
+                  </button>
+                  
+                  {uploadFile && (
+                    <button
+                      onClick={handleFileUploadAndProcess}
+                      disabled={isFileUploading}
+                      className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl font-bold shadow-lg shadow-primary/20 transition-all disabled:opacity-60"
+                    >
+                      {isFileUploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <UploadIcon className="w-5 h-5" />}
+                      {isFileUploading ? "Uploading..." : "Process File"}
+                    </button>
+                  )}
+                </div>
+              </div>
+              
+              {uploadFile && !isFileUploading && (
+                <p className="text-sm text-center text-primary font-medium">
+                  Selected: <span className="font-bold">{uploadFile.name}</span>
+                </p>
+              )}
             </motion.div>
           ) : (
             <motion.div

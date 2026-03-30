@@ -1,33 +1,25 @@
 import axios, { type AxiosError } from "axios";
 
-const RAPIDAPI_HOST = "ai-speech-to-text1.p.rapidapi.com";
-const TRANSCRIBE_URL = `https://${RAPIDAPI_HOST}/transcribe/url`;
+const RAPIDAPI_HOST = "speech-to-text-ai.p.rapidapi.com";
+const TRANSCRIBE_URL = `https://${RAPIDAPI_HOST}/transcribe`;
 
 interface RapidApiResponse {
   text?: string;
   transcript?: string;
-  results?: Array<{
-    transcript?: string;
-    alternatives?: Array<{ transcript?: string }>;
-  }>;
-  data?: { text?: string; transcript?: string };
   output?: string;
   recognized?: string;
+  results?: Array<{ transcript?: string }>;
 }
 
 function extractText(data: RapidApiResponse): string | null {
-  // Handle every known field shape from the RapidAPI speech-to-text family
-  if (data.text) return data.text;
-  if (data.transcript) return data.transcript;
-  if (data.output) return data.output;
-  if (data.recognized) return data.recognized;
-  if (data.data?.text) return data.data.text;
-  if (data.data?.transcript) return data.data.transcript;
-  if (data.results?.[0]?.transcript) return data.results[0].transcript;
-  if (data.results?.[0]?.alternatives?.[0]?.transcript) {
-    return data.results[0].alternatives[0].transcript;
-  }
-  return null;
+  return (
+    data.text ||
+    data.transcript ||
+    data.output ||
+    data.recognized ||
+    data.results?.[0]?.transcript ||
+    null
+  );
 }
 
 function sleep(ms: number) {
@@ -35,9 +27,7 @@ function sleep(ms: number) {
 }
 
 /**
- * Transcribe an audio URL using RapidAPI Speech-to-Text.
- * Retries up to maxRetries times on network/server errors (5xx).
- * Stores nothing — the caller is responsible for persisting the result.
+ * Transcribe an audio URL using RapidAPI Speech-to-Text (Whisper).
  */
 export async function transcribeAudio(
   audioUrl: string,
@@ -51,25 +41,30 @@ export async function transcribeAudio(
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
+      // The API expects url, lang, and task as query parameters per the snippet provided
       const { data } = await axios.post<RapidApiResponse>(
         TRANSCRIBE_URL,
-        { url: audioUrl, language },
+        "file=", // Body as requested in snippet
         {
+          params: {
+            url: audioUrl,
+            lang: language,
+            task: "transcribe",
+          },
           headers: {
             "x-rapidapi-key": apiKey,
             "x-rapidapi-host": RAPIDAPI_HOST,
-            "Content-Type": "application/json",
+            "Content-Type": "application/x-www-form-urlencoded",
           },
-          timeout: 120_000, // 2 minutes — long audio can be slow
+          timeout: 180_000, // 3 minutes
         }
       );
 
       const text = extractText(data);
       if (text?.trim()) return text.trim();
 
-      // Response returned but no text found — don't retry
       console.warn("[speechToText] Unexpected response shape:", JSON.stringify(data));
-      return "Transcription completed, but the API returned no text. The audio may be silent or in an unsupported format.";
+      return "Transcription completed, but no text was extracted. Please ensure the audio contains clear speech.";
     } catch (err) {
       const axiosErr = err as AxiosError;
       const status = axiosErr.response?.status ?? 0;
@@ -80,12 +75,10 @@ export async function transcribeAudio(
           : axiosErr.message
       );
 
-      // 4xx = client error — don't retry
       if (status >= 400 && status < 500) break;
 
       if (attempt < maxRetries) {
         const delay = attempt * 2000;
-        console.warn(`[speechToText] Attempt ${attempt} failed. Retrying in ${delay}ms…`);
         await sleep(delay);
       }
     }

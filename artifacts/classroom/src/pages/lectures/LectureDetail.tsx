@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
+import ReactMarkdown from "react-markdown";
 
 export default function LectureDetail() {
   const [, params] = useRoute("/lectures/:id");
@@ -28,6 +29,7 @@ export default function LectureDetail() {
   const { data: lecture, isLoading } = useGetLecture(id, {
     query: {
       enabled: !!id,
+      queryKey: getGetLectureQueryKey(id),
       refetchInterval: (q) => (q.state.data?.status === "processing" ? 3000 : false),
     },
   });
@@ -217,8 +219,10 @@ export default function LectureDetail() {
                   </div>
                   <h2 className="text-2xl font-display font-bold text-foreground">AI Summary</h2>
                 </div>
-                <div className="prose prose-blue max-w-none text-foreground/90 leading-relaxed whitespace-pre-wrap">
-                  {lecture.summary || "No summary available."}
+                <div className="prose prose-blue prose-invert dark:prose-invert max-w-none text-foreground/90 leading-relaxed">
+                  <ReactMarkdown>
+                    {lecture.summary || "No summary available."}
+                  </ReactMarkdown>
                 </div>
               </div>
 

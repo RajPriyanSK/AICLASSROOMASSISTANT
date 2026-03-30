@@ -10,11 +10,14 @@ import NotFound from "@/pages/not-found";
 import Login from "@/pages/Login";
 import Signup from "@/pages/Signup";
 import TeacherDashboard from "@/pages/dashboard/TeacherDashboard";
-import StudentDashboard from "@/pages/dashboard/StudentDashboard";
 import Recording from "@/pages/dashboard/Recording";
 import TasksExtraction from "@/pages/dashboard/TasksExtraction";
 import Calendar from "@/pages/dashboard/Calendar";
 import Settings from "@/pages/dashboard/Settings";
+import StudentDashboard from "@/pages/dashboard/StudentDashboard";
+import StudentLectures from "@/pages/dashboard/StudentLectures";
+import StudentTasks from "@/pages/dashboard/StudentTasks";
+import StudentCalendar from "@/pages/dashboard/StudentCalendar";
 import LectureDetail from "@/pages/lectures/LectureDetail";
 
 const queryClient = new QueryClient({
@@ -85,6 +88,18 @@ function Router() {
       </Route>
       <Route path="/dashboard/student">
         {() => <ProtectedRoute component={StudentDashboard} allowedRole="student" />}
+      </Route>
+      <Route path="/dashboard/student/lectures">
+        {() => <ProtectedRoute component={StudentLectures} allowedRole="student" />}
+      </Route>
+      <Route path="/dashboard/student/tasks">
+        {() => <ProtectedRoute component={StudentTasks} allowedRole="student" />}
+      </Route>
+      <Route path="/dashboard/student/calendar">
+        {() => <ProtectedRoute component={StudentCalendar} allowedRole="student" />}
+      </Route>
+      <Route path="/dashboard/student/settings">
+        {() => <ProtectedRoute component={Settings} allowedRole="student" />}
       </Route>
       <Route path="/lectures/:id">
         {() => <ProtectedRoute component={LectureDetail} />}

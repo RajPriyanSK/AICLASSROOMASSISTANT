@@ -25,27 +25,25 @@ export interface LectureAnalysis {
 }
 
 const COMBINED_PROMPT = (transcript: string) => `
-You are an expert educational assistant. Analyze the following lecture transcript and return a JSON object.
+You are an expert academic summarizer. Your goal is to transform the following lecture transcript into a professional, beautifully formatted executive summary.
 
-Rules:
-- "summary": A well-structured summary covering all key concepts, topics, and takeaways from the lecture. Use clear paragraphs. Be comprehensive yet concise (4-8 paragraphs).
-- "tasks": Extract ALL assignments, homework, projects, quizzes, readings, and any work students are expected to complete. For each:
-  - "title": A short, clear task name (e.g. "Chapter 5 Reading", "Lab Report Submission")
-  - "description": Full description of what is required, including any instructions mentioned
-  - "due_date": The deadline if mentioned (e.g. "next Friday", "2024-02-15", "before next class") or null if not specified
+Structure the summary with the following sections using clear Markdown:
+1. # [Title of the Lecture] (Create a fitting title)
+2. ## 🎯 Core Objective (1-2 sentences on the main goal)
+3. ## 📝 Key Concepts (Use bold headers and bullet points for detailed explanations)
+4. ## 💡 Critical Insights & Takeaways (What were the most important points?)
+5. ## ❓ Summary (A final concluding paragraph)
 
-If no tasks are mentioned, return an empty array for "tasks".
+Use professional language, high-fidelity formatting, and ensure the summary is visually "aligned" and easy to scan.
+
+Rules for JSON output:
+- "summary": The full markdown-formatted summary as described above.
+- "tasks": (Leave empty or extract for redundancy)
 
 Return ONLY valid JSON matching this exact shape:
 {
   "summary": "...",
-  "tasks": [
-    {
-      "title": "...",
-      "description": "...",
-      "due_date": "..."
-    }
-  ]
+  "tasks": []
 }
 
 Lecture Transcript:
