@@ -11,6 +11,10 @@ import Login from "@/pages/Login";
 import Signup from "@/pages/Signup";
 import TeacherDashboard from "@/pages/dashboard/TeacherDashboard";
 import StudentDashboard from "@/pages/dashboard/StudentDashboard";
+import Recording from "@/pages/dashboard/Recording";
+import TasksExtraction from "@/pages/dashboard/TasksExtraction";
+import Calendar from "@/pages/dashboard/Calendar";
+import Settings from "@/pages/dashboard/Settings";
 import LectureDetail from "@/pages/lectures/LectureDetail";
 
 const queryClient = new QueryClient({
@@ -66,6 +70,18 @@ function Router() {
       <Route path="/signup" component={Signup} />
       <Route path="/dashboard/teacher">
         {() => <ProtectedRoute component={TeacherDashboard} allowedRole="teacher" />}
+      </Route>
+      <Route path="/dashboard/teacher/recording">
+        {() => <ProtectedRoute component={Recording} allowedRole="teacher" />}
+      </Route>
+      <Route path="/dashboard/teacher/tasks">
+        {() => <ProtectedRoute component={TasksExtraction} allowedRole="teacher" />}
+      </Route>
+      <Route path="/dashboard/teacher/calendar">
+        {() => <ProtectedRoute component={Calendar} allowedRole="teacher" />}
+      </Route>
+      <Route path="/dashboard/teacher/settings">
+        {() => <ProtectedRoute component={Settings} allowedRole="teacher" />}
       </Route>
       <Route path="/dashboard/student">
         {() => <ProtectedRoute component={StudentDashboard} allowedRole="student" />}

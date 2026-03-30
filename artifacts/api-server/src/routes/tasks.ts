@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { eq, desc } from "drizzle-orm";
-import { db, tasksTable } from "@workspace/db";
+import { db, tasksTable, lecturesTable } from "@workspace/db";
 import {
   GetTasksQueryParams,
   GetTasksResponse,
@@ -21,10 +21,25 @@ router.get("/tasks", async (req, res): Promise<void> => {
     return;
   }
 
-  let query = db.select().from(tasksTable).$dynamic();
+  let query = db.select({
+    id: tasksTable.id,
+    lectureId: tasksTable.lectureId,
+    title: tasksTable.title,
+    description: tasksTable.description,
+    deadline: tasksTable.deadline,
+    status: tasksTable.status,
+    createdAt: tasksTable.createdAt,
+  })
+  .from(tasksTable)
+  .leftJoin(lecturesTable, eq(tasksTable.lectureId, lecturesTable.id))
+  .$dynamic();
 
   if (params.data.lectureId != null) {
     query = query.where(eq(tasksTable.lectureId, params.data.lectureId));
+  }
+
+  if (params.data.firebaseUid) {
+    query = query.where(eq(lecturesTable.teacherUid, params.data.firebaseUid));
   }
 
   const tasks = await query.orderBy(desc(tasksTable.createdAt));

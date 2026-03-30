@@ -23,14 +23,26 @@ export default function TeacherDashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const queryClient = useQueryClient();
 
+  const lecturesParams = { firebaseUid: firebaseUser?.uid || "" };
   const { data: lectures = [], isLoading: loadingLectures } = useGetLectures(
-    { firebaseUid: firebaseUser?.uid || "" },
-    { query: { enabled: !!firebaseUser?.uid } }
+    lecturesParams,
+    { 
+      query: { 
+        enabled: !!firebaseUser?.uid,
+        queryKey: getGetLecturesQueryKey(lecturesParams)
+      } 
+    }
   );
 
+  const tasksParams = { firebaseUid: firebaseUser?.uid || "" };
   const { data: tasks = [], isLoading: loadingTasks } = useGetTasks(
-    { firebaseUid: firebaseUser?.uid || "" },
-    { query: { enabled: !!firebaseUser?.uid } }
+    tasksParams,
+    { 
+      query: { 
+        enabled: !!firebaseUser?.uid,
+        queryKey: getGetTasksQueryKey(tasksParams)
+      } 
+    }
   );
 
   const deleteMutation = useDeleteLecture();
@@ -72,7 +84,6 @@ export default function TeacherDashboard() {
           <p className="text-muted-foreground mt-2 text-lg">Here's what's happening in your classroom today.</p>
         </motion.div>
 
-        {/* Stats Row */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-card rounded-2xl p-6 border border-border shadow-sm">
             <div className="flex items-center gap-4">
@@ -92,19 +103,28 @@ export default function TeacherDashboard() {
               </div>
             </div>
           </motion.div>
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="bg-card rounded-2xl p-6 border border-border shadow-sm">
+            <div className="flex items-center gap-4">
+              <div className="bg-emerald-500/10 p-4 rounded-2xl text-emerald-500"><Check className="w-6 h-6" /></div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Active Tasks</p>
+                <p className="text-3xl font-display font-bold text-foreground">{tasks.length - pendingTasks.length}</p>
+              </div>
+            </div>
+          </motion.div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Lectures List */}
           <div className="lg:col-span-2 space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-display font-bold text-foreground">Your Lectures</h2>
-              <button
-                onClick={() => setIsModalOpen(true)}
+              <h2 className="text-2xl font-display font-bold text-foreground">Recently Records</h2>
+              <Link
+                href="/dashboard/teacher/recording"
                 className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary/90 transition-all shadow-md shadow-primary/20"
               >
-                <Plus className="w-4 h-4" /> New Lecture
-              </button>
+                <Plus className="w-4 h-4" /> New Record
+              </Link>
             </div>
 
             {lectures.length === 0 ? (
@@ -115,7 +135,7 @@ export default function TeacherDashboard() {
               </div>
             ) : (
               <div className="grid gap-4">
-                {lectures.map((lecture) => (
+                {lectures.slice(0, 5).map((lecture) => (
                   <motion.div
                     key={lecture.id}
                     initial={{ opacity: 0 }}
@@ -128,9 +148,15 @@ export default function TeacherDashboard() {
                         <StatusBadge status={lecture.status} />
                       </div>
                       <p className="text-sm text-muted-foreground line-clamp-1">{lecture.description || 'No description'}</p>
-                      <p className="text-xs text-muted-foreground mt-2 font-medium">
-                        {format(new Date(lecture.createdAt), "MMM d, yyyy")}
-                      </p>
+                      <div className="flex items-center gap-4 mt-2">
+                        <p className="text-xs text-muted-foreground font-medium">
+                          {format(new Date(lecture.createdAt), "MMM d, yyyy")}
+                        </p>
+                        <span className="w-1 h-1 bg-border rounded-full" />
+                        <p className="text-xs text-muted-foreground font-medium">
+                          {lecture.status === 'done' ? 'Processed' : 'Awaiting sync'}
+                        </p>
+                      </div>
                     </div>
                     <div className="flex items-center gap-2">
                       <Link href={`/lectures/${lecture.id}`} className="px-4 py-2 bg-secondary text-secondary-foreground rounded-xl font-medium hover:bg-secondary/80 transition-colors flex items-center gap-2">
@@ -145,51 +171,80 @@ export default function TeacherDashboard() {
                     </div>
                   </motion.div>
                 ))}
+                {lectures.length > 5 && (
+                  <button className="text-center w-full py-2 text-sm font-medium text-primary hover:underline">
+                    View all lectures
+                  </button>
+                )}
               </div>
             )}
           </div>
 
           {/* Pending Tasks Panel */}
           <div className="space-y-6">
-            <h2 className="text-2xl font-display font-bold text-foreground">Tasks to Approve</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-display font-bold text-foreground">Approvals</h2>
+              {pendingTasks.length > 0 && (
+                <span className="bg-amber-500 text-white text-xs font-bold px-2 py-1 rounded-full animate-pulse">
+                  {pendingTasks.length} New
+                </span>
+              )}
+            </div>
             
             <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
               {pendingTasks.length === 0 ? (
-                <div className="p-8 text-center">
-                  <Check className="w-10 h-10 text-emerald-500/50 mx-auto mb-3" />
-                  <p className="text-muted-foreground">All caught up!</p>
+                <div className="p-12 text-center bg-emerald-50/30">
+                  <div className="bg-emerald-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Check className="w-6 h-6 text-emerald-600" />
+                  </div>
+                  <h4 className="font-bold text-foreground">Zero pending</h4>
+                  <p className="text-sm text-muted-foreground mt-1">You've cleared all extractions.</p>
                 </div>
               ) : (
-                <div className="divide-y divide-border">
+                <div className="divide-y divide-border max-h-[600px] overflow-y-auto">
                   {pendingTasks.map((task) => {
                     const lecture = lectures.find(l => l.id === task.lectureId);
                     return (
-                      <div key={task.id} className="p-5">
-                        <p className="text-xs font-semibold text-primary mb-1">{lecture?.title}</p>
-                        <h4 className="font-medium text-foreground">{task.title}</h4>
+                      <motion.div 
+                        key={task.id} 
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className="p-5"
+                      >
+                        <p className="text-[10px] uppercase tracking-wider font-bold text-primary mb-1">{lecture?.title}</p>
+                        <h4 className="font-bold text-foreground line-clamp-1">{task.title}</h4>
                         <p className="text-sm text-muted-foreground mt-1 mb-4 line-clamp-2">{task.description}</p>
                         <div className="flex gap-2">
                           <button
                             onClick={() => handleApprove(task.id)}
-                            className="flex-1 flex justify-center items-center gap-1.5 py-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded-lg font-medium transition-colors text-sm"
+                            className="flex-1 flex justify-center items-center gap-1.5 py-2.5 bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl font-bold transition-all text-xs"
                           >
-                            <Check className="w-4 h-4" /> Approve
+                            <Check className="w-3.5 h-3.5" /> Approve
                           </button>
                           <button
                             onClick={() => handleReject(task.id)}
-                            className="flex-1 flex justify-center items-center gap-1.5 py-2 bg-red-50 text-red-700 hover:bg-red-100 rounded-lg font-medium transition-colors text-sm"
+                            className="p-2.5 bg-secondary text-foreground hover:bg-destructive/10 hover:text-destructive rounded-xl transition-all"
                           >
-                            <X className="w-4 h-4" /> Reject
+                            <X className="w-4 h-4" />
                           </button>
                         </div>
-                      </div>
+                      </motion.div>
                     );
                   })}
                 </div>
               )}
             </div>
+
+            {/* Quick Tips or Stats */}
+            <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl p-6 text-white shadow-lg">
+              <h4 className="font-bold mb-2">Pro Tip</h4>
+              <p className="text-sm opacity-90 leading-relaxed">
+                Use the Recording interface for high-quality audio capture. AI processing is 40% faster on direct uploads.
+              </p>
+            </div>
           </div>
         </div>
+
       </main>
 
       <CreateLectureModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />

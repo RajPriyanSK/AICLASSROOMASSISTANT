@@ -28,7 +28,7 @@ if (!process.env.PORT) process.env.PORT = '5000';
 
 console.log('--- Setting up Database ---');
 try {
-  execSync('pnpm --filter @workspace/db run push', { stdio: 'inherit', shell: true });
+  execSync('npx pnpm --filter @workspace/db run push', { stdio: 'inherit', shell: true });
 } catch (error) {
   console.error('Database push failed. Ensure your DATABASE_URL is correct.');
   process.exit(1);
@@ -45,7 +45,7 @@ const apiProcess = spawn('npx', ['tsx', './src/index.ts'], {
   env: { ...process.env, PORT: '5000', NODE_ENV: 'development' }
 });
 
-const frontendProcess = spawn('pnpm', ['--filter', '@workspace/classroom', 'run', 'dev'], {
+const frontendProcess = spawn('npx', ['pnpm', '--filter', '@workspace/classroom', 'run', 'dev'], {
   stdio: 'inherit',
   shell: true,
   env: { ...process.env, PORT: '5173' } // Force frontend to 5173 to avoid conflict with backend on 5000

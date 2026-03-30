@@ -28,10 +28,13 @@ router.get("/lectures", async (req, res): Promise<void> => {
     return;
   }
 
-  const lectures = await db
-    .select()
-    .from(lecturesTable)
-    .orderBy(desc(lecturesTable.createdAt));
+  let query = db.select().from(lecturesTable).$dynamic();
+
+  if (params.data.firebaseUid) {
+    query = query.where(eq(lecturesTable.teacherUid, params.data.firebaseUid));
+  }
+
+  const lectures = await query.orderBy(desc(lecturesTable.createdAt));
 
   res.json(GetLecturesResponse.parse(lectures));
 });

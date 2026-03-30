@@ -12,13 +12,15 @@ export default defineConfig(({ mode }) => {
   return {
     base: basePath,
     define: {
-      "import.meta.env.VITE_FIREBASE_API_KEY": JSON.stringify(env.FIREBASE_API_KEY || "placeholder-api-key"),
-      "import.meta.env.VITE_FIREBASE_AUTH_DOMAIN": JSON.stringify(env.FIREBASE_AUTH_DOMAIN || "placeholder-auth-domain"),
-      "import.meta.env.VITE_FIREBASE_PROJECT_ID": JSON.stringify(env.FIREBASE_PROJECT_ID || "placeholder-project-id"),
-      "import.meta.env.VITE_FIREBASE_STORAGE_BUCKET": JSON.stringify(env.FIREBASE_STORAGE_BUCKET || "placeholder-storage-bucket"),
-      "import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID": JSON.stringify(env.FIREBASE_MESSAGING_SENDER_ID || "placeholder-messaging-sender-id"),
-      "import.meta.env.VITE_FIREBASE_APP_ID": JSON.stringify(env.FIREBASE_APP_ID || "placeholder-app-id"),
+      "import.meta.env.VITE_FIREBASE_API_KEY": JSON.stringify(env.VITE_FIREBASE_API_KEY || env.FIREBASE_API_KEY || "placeholder-api-key"),
+      "import.meta.env.VITE_FIREBASE_AUTH_DOMAIN": JSON.stringify(env.VITE_FIREBASE_AUTH_DOMAIN || env.FIREBASE_AUTH_DOMAIN || "placeholder-auth-domain"),
+      "import.meta.env.VITE_FIREBASE_PROJECT_ID": JSON.stringify(env.VITE_FIREBASE_PROJECT_ID || env.FIREBASE_PROJECT_ID || "placeholder-project-id"),
+      "import.meta.env.VITE_FIREBASE_STORAGE_BUCKET": JSON.stringify(env.VITE_FIREBASE_STORAGE_BUCKET || env.FIREBASE_STORAGE_BUCKET || "placeholder-storage-bucket"),
+      "import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID": JSON.stringify(env.VITE_FIREBASE_MESSAGING_SENDER_ID || env.FIREBASE_MESSAGING_SENDER_ID || "placeholder-messaging-sender-id"),
+      "import.meta.env.VITE_FIREBASE_APP_ID": JSON.stringify(env.VITE_FIREBASE_APP_ID || env.FIREBASE_APP_ID || "placeholder-app-id"),
     },
+
+
     plugins: [
       react(),
       tailwindcss(),
