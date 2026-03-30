@@ -6,7 +6,7 @@ import {
   sendPasswordResetEmail,
 } from "firebase/auth";
 import { auth } from "@/lib/firebase";
-import { useGetMe, useSyncUser } from "@workspace/api-client-react";
+import { useGetMe, useSyncUser, getGetMeQueryKey } from "@workspace/api-client-react";
 import type { User as DbUser } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -49,6 +49,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     { firebaseUid: firebaseUser?.uid ?? "" },
     {
       query: {
+        queryKey: getGetMeQueryKey({ firebaseUid: firebaseUser?.uid ?? "" }),
         enabled: !!firebaseUser?.uid,
         retry: 2,
         retryDelay: 800,

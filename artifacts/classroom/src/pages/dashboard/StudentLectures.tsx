@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { Navbar } from "@/components/layout/Navbar";
 import { useGetLectures, getGetLecturesQueryKey } from "@workspace/api-client-react";
+import type { Lecture } from "@workspace/api-client-react";
 import { format } from "date-fns";
 import { StatusBadge } from "@/components/StatusBadge";
 import { BookOpen, Search, Filter, BookText, ChevronRight, Clock, Calendar } from "lucide-react";
@@ -23,7 +24,7 @@ export default function StudentLectures() {
   const filteredLectures = lectures.filter((lecture) => {
     const matchesSearch = 
       lecture.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      lecture.description.toLowerCase().includes(searchTerm.toLowerCase());
+      (lecture.description?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false);
     const matchesStatus = statusFilter === "all" || lecture.status === statusFilter;
     return matchesSearch && matchesStatus;
   });

@@ -25,6 +25,7 @@ import {
   X,
   GraduationCap,
   Target,
+  Loader2,
 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
@@ -301,7 +302,3 @@ export default function StudentDashboard() {
     </div>
   );
 }
-
-const Loader2 = ({ className }: { className?: string }) => (
-  <Clock className={className} /> // Workaround for icon name if Loader2 isn't available, but it usually is from lucide-react
-);

@@ -1,25 +1,25 @@
 import { useState, useMemo } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { Navbar } from "@/components/layout/Navbar";
-import { 
-  useGetTasks, 
-  useApproveTask, 
-  useRejectTask, 
+import {
+  useGetTasks,
+  useApproveTask,
+  useRejectTask,
   useGetLectures,
   getGetTasksQueryKey,
   getGetLecturesQueryKey
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { 
-  ListTodo, Search, Filter, Check, X, 
+import {
+  ListTodo, Search, Filter, Check, X,
   Calendar as CalendarIcon, Loader2, AlertCircle,
   MoreVertical, CheckCircle2, XCircle, Clock
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { format } from "date-fns";
-import { StatusBadge } from "@/components/StatusBadge";
 import { Link } from "wouter";
+import { StatusBadge } from "@/components/StatusBadge";
 
 export default function TasksExtraction() {
   const { firebaseUser } = useAuth();
@@ -46,8 +46,8 @@ export default function TasksExtraction() {
 
   const filteredTasks = useMemo(() => {
     return tasks.filter(task => {
-      const matchesSearch = task.title.toLowerCase().includes(search.toLowerCase()) || 
-                           task.description?.toLowerCase().includes(search.toLowerCase());
+      const matchesSearch = task.title.toLowerCase().includes(search.toLowerCase()) ||
+        task.description?.toLowerCase().includes(search.toLowerCase());
       const matchesStatus = statusFilter === "all" || task.status === statusFilter;
       return matchesSearch && matchesStatus;
     });
@@ -130,8 +130,8 @@ export default function TasksExtraction() {
             <AlertCircle className="w-16 h-16 text-muted-foreground/20 mx-auto mb-6" />
             <h3 className="text-2xl font-bold text-foreground mb-2">No tasks found</h3>
             <p className="text-muted-foreground max-w-sm mx-auto">
-              {search || statusFilter !== "all" 
-                ? "Try adjusting your filters or search terms." 
+              {search || statusFilter !== "all"
+                ? "Try adjusting your filters or search terms."
                 : "No tasks have been extracted from your lectures yet."}
             </p>
           </div>
@@ -156,7 +156,7 @@ export default function TasksExtraction() {
                         </div>
                         <h3 className="text-2xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">{task.title}</h3>
                         <p className="text-muted-foreground leading-relaxed mb-6">{task.description || 'No description available for this task.'}</p>
-                        
+
                         <div className="flex flex-wrap items-center gap-6">
                           {task.deadline && (
                             <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-50 text-amber-700 rounded-xl text-sm font-bold border border-amber-100">
@@ -194,7 +194,7 @@ export default function TasksExtraction() {
                             <CheckCircle2 className="w-5 h-5" /> Approved
                           </button>
                         )}
-                         {task.status === "rejected" && (
+                        {task.status === "rejected" && (
                           <button
                             disabled
                             className="w-full md:w-40 flex items-center justify-center gap-2 py-3 px-6 bg-red-100 text-red-700 rounded-2xl font-bold opacity-80"
@@ -202,7 +202,7 @@ export default function TasksExtraction() {
                             <XCircle className="w-5 h-5" /> Rejected
                           </button>
                         )}
-                        <Link 
+                        <Link
                           href={`/lectures/${task.lectureId}`}
                           className="p-3 bg-secondary text-muted-foreground hover:text-foreground rounded-2xl transition-all border border-border flex justify-center"
                           title="View Source Lecture"

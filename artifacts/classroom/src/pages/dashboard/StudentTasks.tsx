@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { Navbar } from "@/components/layout/Navbar";
 import { useGetTasks, useCompleteTask, getGetTasksQueryKey, useGetLectures, getGetLecturesQueryKey } from "@workspace/api-client-react";
+import type { Task, Lecture } from "@workspace/api-client-react";
 import { format, differenceInCalendarDays, parseISO } from "date-fns";
 import { CheckCircle, ListTodo, Calendar, Clock, AlertCircle, BookOpen, ChevronRight, LayoutList } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -45,7 +46,7 @@ export default function StudentTasks() {
   const handleComplete = async (id: number) => {
     try {
       await completeMutation.mutateAsync({ id });
-      queryClient.invalidateQueries({ queryKey: getGetTasksQueryKey() });
+      queryClient.invalidateQueries({ queryKey: getGetTasksQueryKey(tasksParams) });
       toast({ title: "Task completed!", description: "Great work on finishing your assignment." });
     } catch {
       toast({ title: "Failed to update", variant: "destructive" });
