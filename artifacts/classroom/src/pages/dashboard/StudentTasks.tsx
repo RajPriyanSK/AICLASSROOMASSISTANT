@@ -29,7 +29,7 @@ export default function StudentTasks() {
   const [, setLocation] = useLocation();
   const [activeTab, setActiveTab] = useState<"pending" | "completed">("pending");
 
-  const tasksParams = { firebaseUid: firebaseUser?.uid || "" };
+  const tasksParams = { firebaseUid: firebaseUser?.uid || "", status: "approved" as const };
   const { data: tasks = [], isLoading } = useGetTasks(
     tasksParams,
     { query: { enabled: !!firebaseUser?.uid, queryKey: getGetTasksQueryKey(tasksParams) } }

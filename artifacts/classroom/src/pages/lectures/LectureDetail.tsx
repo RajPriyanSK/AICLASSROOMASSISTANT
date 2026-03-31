@@ -219,7 +219,7 @@ export default function LectureDetail() {
                   </div>
                   <h2 className="text-2xl font-display font-bold text-foreground">AI Summary</h2>
                 </div>
-                <div className="prose prose-blue prose-invert dark:prose-invert max-w-none text-foreground/90 leading-relaxed">
+                <div className="prose prose-blue max-w-none text-foreground/90 leading-relaxed">
                   <ReactMarkdown>
                     {lecture.summary || "No summary available."}
                   </ReactMarkdown>

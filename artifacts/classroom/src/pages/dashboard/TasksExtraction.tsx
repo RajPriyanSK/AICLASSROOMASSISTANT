@@ -56,7 +56,7 @@ export default function TasksExtraction() {
   const handleApprove = async (id: number) => {
     try {
       await approveMutation.mutateAsync({ id });
-      queryClient.invalidateQueries({ queryKey: getGetTasksQueryKey() });
+      queryClient.invalidateQueries({ queryKey: getGetTasksQueryKey(tasksParams) });
       toast({ title: "Task approved" });
     } catch {
       toast({ title: "Failed to approve", variant: "destructive" });
@@ -66,7 +66,7 @@ export default function TasksExtraction() {
   const handleReject = async (id: number) => {
     try {
       await rejectMutation.mutateAsync({ id });
-      queryClient.invalidateQueries({ queryKey: getGetTasksQueryKey() });
+      queryClient.invalidateQueries({ queryKey: getGetTasksQueryKey(tasksParams) });
       toast({ title: "Task rejected" });
     } catch {
       toast({ title: "Failed to reject", variant: "destructive" });

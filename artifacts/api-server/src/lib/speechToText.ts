@@ -1,4 +1,5 @@
 import axios, { type AxiosError } from "axios";
+import FormData from "form-data";
 
 const RAPIDAPI_HOST = "speech-to-text-ai.p.rapidapi.com";
 const TRANSCRIBE_URL = `https://${RAPIDAPI_HOST}/transcribe`;
@@ -41,23 +42,28 @@ export async function transcribeAudio(
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      // The API expects url, lang, and task as query parameters per the snippet provided
-      const encodedParams = new URLSearchParams();
-      encodedParams.set('file', 'undefined');
+      // 1. Download the audio file to a buffer to ensure RapidAPI receives a proper file
+      console.log(`[speechToText] Downloading audio from ${audioUrl}...`);
+      const audioResponse = await axios.get(audioUrl, { responseType: "arraybuffer", timeout: 60000 });
+      const buffer = Buffer.from(audioResponse.data);
 
+      // 2. Prepare multipart/form-data
+      const form = new FormData();
+      form.append("file", buffer, { filename: "lecture.mp3" });
+
+      console.log(`[speechToText] Uploading to RapidAPI... (params: lang=${language}, task=transcribe)`);
       const { data } = await axios.post<RapidApiResponse>(
         TRANSCRIBE_URL,
-        encodedParams,
+        form,
         {
           params: {
-            url: audioUrl,
             lang: language,
             task: "transcribe",
           },
           headers: {
+            ...form.getHeaders(),
             "x-rapidapi-key": apiKey,
             "x-rapidapi-host": RAPIDAPI_HOST,
-            "Content-Type": "application/x-www-form-urlencoded",
           },
           timeout: 480_000, // 8 minutes
         }

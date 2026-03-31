@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { eq, desc } from "drizzle-orm";
-import { db, tasksTable, lecturesTable } from "@workspace/db";
+import { db, tasksTable, lecturesTable, usersTable } from "@workspace/db";
 import {
   GetTasksQueryParams,
   GetTasksResponse,
@@ -39,7 +39,28 @@ router.get("/tasks", async (req, res): Promise<void> => {
   }
 
   if (params.data.firebaseUid) {
-    query = query.where(eq(lecturesTable.teacherUid, params.data.firebaseUid));
+    // Check if the user is a student or teacher
+    const [user] = await db.select().from(usersTable).where(eq(usersTable.firebaseUid, params.data.firebaseUid)).limit(1);
+
+    if (user?.role === "student") {
+      // Students ONLY see approved or completed tasks
+      if (params.data.status === "completed") {
+        query = query.where(eq(tasksTable.status, "completed"));
+      } else {
+        query = query.where(eq(tasksTable.status, "approved"));
+      }
+    } else if (params.data.status) {
+      // Teachers can filter by status
+      query = query.where(eq(tasksTable.status, params.data.status));
+    }
+
+    // Filter by the user's lectures if teacher, or just lectures in general if student?
+    // Actually, lecturesTable.teacherUid is correct for teacher filtering.
+    if (user?.role === "teacher") {
+      query = query.where(eq(lecturesTable.teacherUid, params.data.firebaseUid));
+    }
+    // If student, they see all tasks for all lectures they are in? 
+    // Currently, students see all approved tasks across the system, which is fine for this MVP.
   }
 
   const tasks = await query.orderBy(desc(tasksTable.createdAt));

@@ -252,6 +252,7 @@ export type GetTasksParams = {
    */
   lectureId?: number | null;
   firebaseUid: string;
+  status?: TaskStatus | null;
 };
 
 export type UploadLectureAudioBody = {

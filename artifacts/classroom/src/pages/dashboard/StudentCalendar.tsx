@@ -35,7 +35,7 @@ export default function StudentCalendar() {
     { query: { enabled: !!firebaseUser?.uid, queryKey: getGetLecturesQueryKey(lecturesParams) } }
   );
 
-  const tasksParams = { firebaseUid: firebaseUser?.uid || "" };
+  const tasksParams = { firebaseUid: firebaseUser?.uid || "", status: "approved" as const };
   const { data: tasks = [], isLoading } = useGetTasks(
     tasksParams,
     { query: { enabled: !!firebaseUser?.uid, queryKey: getGetTasksQueryKey(tasksParams) } }

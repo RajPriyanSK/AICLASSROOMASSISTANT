@@ -159,6 +159,7 @@ export const GetUploadUrlResponse = zod.object({
 export const GetTasksQueryParams = zod.object({
   lectureId: zod.coerce.number().nullish(),
   firebaseUid: zod.coerce.string(),
+  status: zod.enum(["pending", "approved", "rejected", "completed"]).nullish(),
 });
 
 export const GetTasksResponseItem = zod.object({
@@ -287,7 +288,7 @@ export const TranscribeLectureResponse = zod.object({
  * @summary Upload audio file directly to Supabase Storage
  */
 export const UploadLectureAudioBody = zod.object({
-  audio: zod.instanceof(File).describe("The audio file to upload"),
+  audio: zod.any().describe("The audio file to upload"),
   lectureId: zod
     .string()
     .optional()

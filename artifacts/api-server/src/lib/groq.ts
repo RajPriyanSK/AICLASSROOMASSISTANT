@@ -75,3 +75,31 @@ ${transcript}`,
 
   return completion.choices[0]?.message?.content ?? "I couldn't generate a response. Please try again.";
 }
+
+export async function summarizeLecture(transcript: string): Promise<string> {
+  const completion = await groq.chat.completions.create({
+    model: "llama-3.3-70b-versatile",
+    messages: [
+      {
+        role: "system",
+        content: `You are an expert academic summarizer. Your goal is to transform lecture transcripts into professional, beautifully formatted executive summaries.
+        
+        Structure the summary with the following sections using clear Markdown:
+        1. # [Title of the Lecture] (Create a fitting title)
+        2. ## 🎯 Core Objective (1-2 sentences on the main goal)
+        3. ## 📝 Key Concepts (Use bold headers and bullet points for detailed explanations)
+        4. ## 💡 Critical Insights & Takeaways (What were the most important points?)
+        5. ## ❓ Summary (A final concluding paragraph)
+        
+        Use professional language and high-fidelity formatting.`,
+      },
+      {
+        role: "user",
+        content: `Please summarize this lecture transcript:\n\n${transcript}`,
+      },
+    ],
+    temperature: 0.3,
+  });
+
+  return completion.choices[0]?.message?.content ?? "Failed to generate summary.";
+}
