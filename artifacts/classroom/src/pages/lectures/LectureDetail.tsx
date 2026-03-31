@@ -13,7 +13,7 @@ import {
 import { StatusBadge } from "@/components/StatusBadge";
 import {
   FileText, ListTodo, Send, Bot, User as UserIcon,
-  Loader2, RefreshCw, Mic, Upload as UploadIcon, Calendar,
+  Loader2, RefreshCw, Mic, Upload as UploadIcon, Calendar, Volume2,
 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
@@ -146,6 +146,26 @@ export default function LectureDetail() {
             <StatusBadge status={lecture.status} />
           </div>
         </div>
+
+        {/* Audio Player Section */}
+        {lecture.audioUrl && (
+          <div className="bg-card border border-border rounded-3xl p-6 shadow-sm flex flex-col md:flex-row items-center gap-6">
+            <div className="bg-primary/10 p-4 rounded-2xl shrink-0">
+              <Volume2 className="w-8 h-8 text-primary" />
+            </div>
+            <div className="flex-1 w-full">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-bold text-foreground">Lecture Recording</h3>
+                <span className="text-xs text-muted-foreground font-mono">Original Audio</span>
+              </div>
+              <audio 
+                src={lecture.audioUrl} 
+                controls 
+                className="w-full h-10 rounded-lg accent-primary"
+              />
+            </div>
+          </div>
+        )}
 
         {/* Teacher Audio Controls — pending status */}
         {isTeacher && lecture.status === "pending" && (
