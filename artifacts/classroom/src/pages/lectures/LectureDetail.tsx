@@ -137,13 +137,15 @@ export default function LectureDetail() {
 
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-8">
         {/* Header */}
-        <div className="bg-card border border-border rounded-3xl p-8 shadow-sm">
-          <div className="flex items-start justify-between mb-2">
+        <div className="bg-card border border-border rounded-3xl p-5 sm:p-8 shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-display font-bold text-foreground mb-2">{lecture.title}</h1>
-              <p className="text-lg text-muted-foreground">{lecture.description}</p>
+              <h1 className="text-2xl sm:text-3xl font-display font-bold text-foreground mb-2">{lecture.title}</h1>
+              <p className="text-base sm:text-lg text-muted-foreground">{lecture.description}</p>
             </div>
-            <StatusBadge status={lecture.status} />
+            <div className="shrink-0">
+              <StatusBadge status={lecture.status} />
+            </div>
           </div>
         </div>
 
@@ -232,14 +234,14 @@ export default function LectureDetail() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-8">
               {/* Summary */}
-              <div className="bg-card border border-border rounded-3xl p-8 shadow-sm">
+              <div className="bg-card border border-border rounded-3xl p-6 sm:p-8 shadow-sm">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="bg-primary/10 p-2 rounded-xl">
                     <FileText className="w-6 h-6 text-primary" />
                   </div>
-                  <h2 className="text-2xl font-display font-bold text-foreground">AI Summary</h2>
+                  <h2 className="text-xl sm:text-2xl font-display font-bold text-foreground">AI Summary</h2>
                 </div>
-                <div className="prose prose-blue max-w-none text-foreground/90 leading-relaxed">
+                <div className="prose prose-blue max-w-none text-foreground/90 leading-relaxed text-sm sm:text-base">
                   <ReactMarkdown>
                     {lecture.summary || "No summary available."}
                   </ReactMarkdown>
@@ -247,14 +249,14 @@ export default function LectureDetail() {
               </div>
 
               {/* Transcript */}
-              <div className="bg-card border border-border rounded-3xl p-8 shadow-sm">
+              <div className="bg-card border border-border rounded-3xl p-6 sm:p-8 shadow-sm">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="bg-secondary p-2 rounded-xl">
                     <Mic className="w-6 h-6 text-foreground" />
                   </div>
-                  <h2 className="text-2xl font-display font-bold text-foreground">Transcript</h2>
+                  <h2 className="text-xl sm:text-2xl font-display font-bold text-foreground">Transcript</h2>
                 </div>
-                <div className="bg-secondary/30 p-6 rounded-2xl max-h-[400px] overflow-y-auto font-mono text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap border border-border/50">
+                <div className="bg-secondary/30 p-4 sm:p-6 rounded-2xl max-h-[400px] overflow-y-auto font-mono text-xs sm:text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap border border-border/50">
                   {lecture.transcript || "No transcript available."}
                 </div>
               </div>

@@ -77,11 +77,11 @@ export default function TeacherDashboard() {
       <Navbar />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-10">
-          <h1 className="text-4xl font-display font-bold text-foreground">
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-6 sm:mb-10">
+          <h1 className="text-3xl sm:text-4xl font-display font-bold text-foreground">
             Welcome, Dr. {dbUser?.displayName?.split(' ')[0] || 'Teacher'}
           </h1>
-          <p className="text-muted-foreground mt-2 text-lg">Here's what's happening in your classroom today.</p>
+          <p className="text-muted-foreground mt-2 text-base sm:text-lg">Here's what's happening in your classroom today.</p>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
