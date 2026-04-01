@@ -4,8 +4,12 @@ import path from "path";
 import { fileURLToPath } from "url";
 import router from "./routes";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const appFilename = typeof import.meta !== 'undefined' && import.meta.url
+  ? fileURLToPath(import.meta.url)
+  : (typeof __filename !== 'undefined' ? __filename : "");
+const appDirname = typeof import.meta !== 'undefined' && import.meta.url
+  ? path.dirname(appFilename)
+  : (typeof __dirname !== 'undefined' ? __dirname : "");
 
 const app: Express = express();
 
@@ -21,7 +25,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api", router);
 
 // Serve static files from the classroom frontend build
-const frontendPath = path.resolve(__dirname, "../../classroom/dist/public");
+const frontendPath = path.resolve(appDirname, "../../classroom/dist/public");
 app.use(express.static(frontendPath));
 
 // Handle SPAs by serving index.html for all other routes
