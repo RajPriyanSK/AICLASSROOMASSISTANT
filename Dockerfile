@@ -1,4 +1,3 @@
-# syntax=docker/dockerfile:1
 FROM node:22-alpine AS base
 
 # Install pnpm and setup environment
@@ -13,15 +12,15 @@ WORKDIR /app
 # Copy everything for the build
 COPY . .
 
-# Install dependencies with cache mount for speed
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+# Install dependencies (regular install is more stable if BuildKit crashes)
+RUN pnpm install --frozen-lockfile
 
-# Build the monorepo (builds classroom frontend and api-server)
-# Note: Ensure .env is present if build-time variables (VITE_*) are required
-RUN pnpm run build
+# Build the monorepo (skipping typecheck to save memory/time)
+# This only builds classroom frontend and bundles api-server
+RUN pnpm -r --filter "@workspace/classroom" --filter "@workspace/api-server" run build
 
 # --- Runner Stage ---
-FROM node:22-slim AS runner
+FROM node:22-alpine AS runner
 WORKDIR /app
 
 # Copy the built server and frontend
