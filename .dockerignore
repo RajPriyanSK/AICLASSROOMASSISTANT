@@ -1,0 +1,14 @@
+node_modules
+.git
+.env
+artifacts/**/dist
+artifacts/**/node_modules
+lib/**/node_modules
+scripts/node_modules
+.replit
+.replitignore
+replit.md
+errors.txt
+typecheck_output.txt
+pnpm-debug.log
+.npmrc
