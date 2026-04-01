@@ -73,6 +73,7 @@ router.post(
       return;
     } catch (err: any) {
       res.status(500).json({ error: err.message ?? "Upload failed" });
+      return;
     }
   }
 );

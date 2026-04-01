@@ -37,6 +37,7 @@ router.post("/users/sync", async (req, res): Promise<void> => {
   } catch (err) {
     console.error("DATABASE_ERROR in /api/users/sync:", err);
     res.status(500).json({ error: "Internal database error during sync" });
+    return;
   }
 });
 
@@ -63,6 +64,7 @@ router.get("/users/me", async (req, res): Promise<void> => {
   } catch (err) {
     console.error("DATABASE_ERROR in /api/users/me:", err);
     res.status(500).json({ error: "Internal database error" });
+    return;
   }
 });
 

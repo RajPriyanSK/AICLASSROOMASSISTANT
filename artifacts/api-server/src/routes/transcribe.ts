@@ -85,6 +85,7 @@ router.post("/transcribe", async (req, res): Promise<void> => {
       audioUrl: audioUrl.trim(),
       lectureId: parsedLectureId,
     });
+    return;
   }
 });
 

@@ -66,6 +66,7 @@ router.post("/questions", async (req, res): Promise<void> => {
     .returning();
 
   res.status(201).json(created);
+  return;
 });
 
 router.patch("/questions/:id/answer", async (req, res): Promise<void> => {
@@ -96,6 +97,7 @@ router.delete("/questions/:id", async (req, res): Promise<void> => {
   const id = parseInt(req.params.id);
   await db.delete(questionsTable).where(eq(questionsTable.id, id));
   res.status(204).send();
+  return;
 });
 
 export default router;

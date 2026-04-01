@@ -93,6 +93,7 @@ router.post("/summarize", async (req, res): Promise<void> => {
       error: err.message ?? "Gemini analysis failed",
       lectureId: parsedLectureId,
     });
+    return;
   }
 });
 

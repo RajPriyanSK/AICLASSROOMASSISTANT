@@ -58,6 +58,7 @@ router.post("/lectures", async (req, res): Promise<void> => {
     .returning();
 
   res.status(201).json(lecture);
+  return;
 });
 
 router.get("/lectures/:id", async (req, res): Promise<void> => {
@@ -215,6 +216,7 @@ router.post("/lectures/:id/process", async (req, res): Promise<void> => {
     const message = err instanceof Error ? err.message : "Processing failed";
     console.error("[lectures] Processing error:", err);
     res.status(500).json({ error: message });
+    return;
   }
 });
 
