@@ -46,17 +46,17 @@ async function buildAll() {
   await rm(distDir, { recursive: true, force: true });
 
   console.log("building server...");
-  const pkgPath = path.resolve(__dirname, "package.json");
-  const pkg = JSON.parse(await readFile(pkgPath, "utf-8"));
-  const allDeps = [
-    ...Object.keys(pkg.dependencies || {}),
-    ...Object.keys(pkg.devDependencies || {}),
+  // Bundle everything except Node.js built-ins
+  const externals = [
+    "node:path", "node:fs", "node:http", "node:https", "node:crypto",
+    "node:url", "node:events", "node:stream", "node:os", "node:util",
+    "node:zlib", "node:buffer", "node:querystring", "node:diagnostics_channel",
+    "path", "fs", "http", "https", "crypto", "url", "events", "stream",
+    "os", "util", "zlib", "buffer", "querystring", "net", "tls", "timers", 
+    "string_decoder", "async_hooks", "node:async_hooks", "node:net", "node:tls"
   ];
-  const externals = allDeps.filter(
-    (dep) =>
-      !allowlist.includes(dep) &&
-      !(pkg.dependencies?.[dep]?.startsWith("workspace:")),
-  );
+
+  console.log("Externals:", externals);
 
   await esbuild({
     entryPoints: [path.resolve(__dirname, "src/index.ts")],
@@ -68,7 +68,7 @@ async function buildAll() {
       "process.env.NODE_ENV": '"production"',
     },
     minify: true,
-    external: externals,
+    // external: externals,
     logLevel: "info",
   });
 }

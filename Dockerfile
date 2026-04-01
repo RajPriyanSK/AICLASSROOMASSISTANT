@@ -21,16 +21,12 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 RUN pnpm run build
 
 # --- Runner Stage ---
-FROM base AS runner
+FROM node:22-slim AS runner
 WORKDIR /app
 
-# Copy the entire workspace from builder
-# We then prune it to leave only production dependencies
-COPY --from=builder /app /app
-
-# Prune dev dependencies to reduce image size
-ENV CI=true
-RUN pnpm prune --prod
+# Copy the built server and frontend
+COPY --from=builder /app/artifacts/api-server/dist /app/artifacts/api-server/dist
+COPY --from=builder /app/artifacts/classroom/dist /app/artifacts/classroom/dist
 
 # Default environment variables
 ENV NODE_ENV=production
@@ -39,5 +35,5 @@ ENV PORT=5000
 # Expose the API server port
 EXPOSE 5000
 
-# Start the application
-CMD ["pnpm", "start"]
+# Start the application using the bundled file directly
+CMD ["node", "artifacts/api-server/dist/index.cjs"]
