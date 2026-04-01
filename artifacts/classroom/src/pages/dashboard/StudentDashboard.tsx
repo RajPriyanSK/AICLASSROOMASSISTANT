@@ -129,14 +129,14 @@ export default function StudentDashboard() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-10">
         {/* ──── WELCOME HEADER ──────────────────────────────────── */}
-        <motion.div {...fadeUp} className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border border-primary/10 p-8">
+        <motion.div {...fadeUp} className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border border-primary/10 p-6 sm:p-8">
           <div className="absolute top-4 right-6 opacity-10">
-            <GraduationCap className="w-24 h-24 text-primary" />
+            <GraduationCap className="w-16 h-16 sm:w-24 sm:h-24 text-primary" />
           </div>
-          <h1 className="text-4xl font-display font-bold text-foreground">
+          <h1 className="text-3xl sm:text-4xl font-display font-bold text-foreground">
             Welcome back, {dbUser?.displayName?.split(" ")[0] || "Student"} 👋
           </h1>
-          <p className="text-muted-foreground mt-2 text-lg max-w-xl">
+          <p className="text-muted-foreground mt-2 text-base sm:text-lg max-w-xl">
             Your AI-powered study hub. Review your lectures, track assignments, and chat with your personal tutor.
           </p>
         </motion.div>
@@ -253,7 +253,7 @@ export default function StudentDashboard() {
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="w-[380px] h-[500px] bg-card border border-border rounded-3xl shadow-2xl flex flex-col overflow-hidden"
+              className="w-[calc(100vw-2rem)] sm:w-[380px] h-[500px] bg-card border border-border rounded-3xl shadow-2xl flex flex-col overflow-hidden"
             >
               <div className="p-4 border-b border-border bg-gradient-to-r from-primary/10 to-violet-500/10 flex items-center justify-between">
                 <div className="flex items-center gap-3">
