@@ -29,6 +29,7 @@ WORKDIR /app
 COPY --from=builder /app /app
 
 # Prune dev dependencies to reduce image size
+ENV CI=true
 RUN pnpm prune --prod
 
 # Default environment variables
