@@ -37,6 +37,7 @@ router.get("/lectures", async (req, res): Promise<void> => {
   const lectures = await query.orderBy(desc(lecturesTable.createdAt));
 
   res.json(GetLecturesResponse.parse(lectures));
+  return;
 });
 
 router.post("/lectures", async (req, res): Promise<void> => {
@@ -88,6 +89,7 @@ router.get("/lectures/:id", async (req, res): Promise<void> => {
       tasks,
     })
   );
+  return;
 });
 
 router.delete("/lectures/:id", async (req, res): Promise<void> => {
@@ -109,6 +111,7 @@ router.delete("/lectures/:id", async (req, res): Promise<void> => {
   }
 
   res.sendStatus(204);
+  return;
 });
 
 router.post("/lectures/:id/upload-url", async (req, res): Promise<void> => {
@@ -149,6 +152,7 @@ router.post("/lectures/:id/upload-url", async (req, res): Promise<void> => {
       publicUrl,
     })
   );
+  return;
 });
 
 router.post("/lectures/:id/process", async (req, res): Promise<void> => {
@@ -201,6 +205,7 @@ router.post("/lectures/:id/process", async (req, res): Promise<void> => {
         tasksExtracted: taskInserts.length,
       })
     );
+    return;
   } catch (err) {
     await db
       .update(lecturesTable)

@@ -31,6 +31,7 @@ router.post("/chat", async (req, res): Promise<void> => {
   const answer = await chatWithLecture(lecture.transcript, parsed.data.message);
 
   res.json(ChatResponse.parse({ answer }));
+  return;
 });
 
 export default router;

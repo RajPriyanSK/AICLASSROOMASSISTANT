@@ -35,6 +35,7 @@ router.get("/questions", async (req, res): Promise<void> => {
     : await db.select().from(questionsTable).orderBy(questionsTable.createdAt);
 
   res.json(questions);
+  return;
 });
 
 router.post("/questions", async (req, res): Promise<void> => {
@@ -88,6 +89,7 @@ router.patch("/questions/:id/answer", async (req, res): Promise<void> => {
   }
 
   res.json(updated);
+  return;
 });
 
 router.delete("/questions/:id", async (req, res): Promise<void> => {

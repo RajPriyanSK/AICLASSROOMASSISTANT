@@ -84,6 +84,7 @@ router.get("/teacher/lectures", async (req, res): Promise<void> => {
   }));
 
   res.json(enriched);
+  return;
 });
 
 export default router;

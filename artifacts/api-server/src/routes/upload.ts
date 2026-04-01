@@ -70,6 +70,7 @@ router.post(
         size: req.file.size,
         mimeType: req.file.mimetype,
       });
+      return;
     } catch (err: any) {
       res.status(500).json({ error: err.message ?? "Upload failed" });
     }

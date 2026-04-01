@@ -65,6 +65,7 @@ router.get("/tasks", async (req, res): Promise<void> => {
 
   const tasks = await query.orderBy(desc(tasksTable.createdAt));
   res.json(GetTasksResponse.parse(tasks));
+  return;
 });
 
 router.patch("/tasks/:id/approve", async (req, res): Promise<void> => {
@@ -87,6 +88,7 @@ router.patch("/tasks/:id/approve", async (req, res): Promise<void> => {
   }
 
   res.json(ApproveTaskResponse.parse(task));
+  return;
 });
 
 router.patch("/tasks/:id/reject", async (req, res): Promise<void> => {
@@ -109,6 +111,7 @@ router.patch("/tasks/:id/reject", async (req, res): Promise<void> => {
   }
 
   res.json(RejectTaskResponse.parse(task));
+  return;
 });
 
 router.patch("/tasks/:id/complete", async (req, res): Promise<void> => {
@@ -131,6 +134,7 @@ router.patch("/tasks/:id/complete", async (req, res): Promise<void> => {
   }
 
   res.json(CompleteTaskResponse.parse(task));
+  return;
 });
 
 export default router;

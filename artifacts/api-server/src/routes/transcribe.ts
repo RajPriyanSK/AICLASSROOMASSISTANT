@@ -69,6 +69,7 @@ router.post("/transcribe", async (req, res): Promise<void> => {
       charCount: transcript.length,
       wordCount: transcript.split(/\s+/).filter(Boolean).length,
     });
+    return;
   } catch (err: any) {
     // If we marked the lecture as processing, set it back to error
     if (parsedLectureId) {

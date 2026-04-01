@@ -87,6 +87,7 @@ router.post("/summarize", async (req, res): Promise<void> => {
       lectureId: parsedLectureId,
       tasksCreated,
     });
+    return;
   } catch (err: any) {
     res.status(500).json({
       error: err.message ?? "Gemini analysis failed",
