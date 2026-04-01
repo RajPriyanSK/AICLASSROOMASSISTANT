@@ -8,7 +8,7 @@
 
 export type UploadLectureAudioBody = {
   /** The audio file to upload */
-  audio: Blob;
+  audio: any;
   /** Optional lecture ID used for naming the file */
   lectureId?: string;
 };
