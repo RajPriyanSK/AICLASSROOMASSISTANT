@@ -43,7 +43,7 @@ const frontendPath = path.resolve(appDirname, "../../classroom/dist/public");
 app.use(express.static(frontendPath));
 
 // Handle SPAs by serving index.html for all other routes
-app.get("*", (req, res) => {
+app.get("*splat", (req, res) => {
   // Never serve frontend for API routes
   if (req.path.startsWith("/api")) {
     return res.status(404).json({ error: "Not found" });
