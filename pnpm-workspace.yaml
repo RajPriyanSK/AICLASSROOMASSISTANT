@@ -30,9 +30,11 @@ catalog:
   zod: ^3.25.76
 
 onlyBuiltDependencies:
+  - '@firebase/util'
   - '@swc/core'
   - esbuild
   - msw
+  - protobufjs
   - unrs-resolver
 
 overrides:
